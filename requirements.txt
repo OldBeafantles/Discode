@@ -1,0 +1,6 @@
+asyncio
+datetime
+discord
+logging
+json
+tzlocal

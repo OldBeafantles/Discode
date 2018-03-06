@@ -1,0 +1,14 @@
+# Python cache
+__pycache__
+
+# Settings (relative to each bot instances)
+settings
+
+# Log
+discord.log
+
+# Data files
+data
+
+# Visual Studio Code configuration
+.vscode
