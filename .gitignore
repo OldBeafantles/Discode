@@ -12,3 +12,6 @@ data
 
 # Visual Studio Code configuration
 .vscode
+
+# The key for my VPS
+VPS_private_key.ppk
