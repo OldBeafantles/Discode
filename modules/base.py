@@ -490,8 +490,10 @@ class Base:
             "%d/%m/%Y %H:%M:%S") + " (" + utils.convert_seconds_to_str(
                 delta.total_seconds()) + " ago)")
 
-        python_version = str(
-            subprocess.check_output("python --version", shell=True))[2:-5]
+        verbose_version = str(
+            subprocess.check_output("python --version", shell=True))
+        python_version = verbose_version[2:(
+            -5 if verbose_version.endswith("\\r\\n'") else -3)]
         python_version += " " + platform.architecture()[0][:-3] + " bits"
         commit = str(subprocess.check_output("git rev-parse HEAD",
                                              shell=True))[2:-3]
