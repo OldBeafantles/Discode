@@ -1,6 +1,7 @@
+aiohttp
 asyncio
 datetime
 discord
-logging
-json
+simplejson
 tzlocal
+yapf
