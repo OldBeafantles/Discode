@@ -2,6 +2,7 @@ aiohttp
 asyncio
 datetime
 discord
+requests
 simplejson
 tzlocal
 yapf
