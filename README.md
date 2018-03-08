@@ -1,6 +1,7 @@
 # Discode
 
 Discode is a Discord bot that runs code.
+
 It has been originally written for C++ support and it will remain the priority.
 
 ## Why?
@@ -270,6 +271,8 @@ compiler-options -Wall
 - Compilation / execution duration (wandbox's API doesn't give these info though...)
 - Language reference research
 - Beautify codes
+- Allow use of most common libraries (like boost for C++)
+- Upload user request + result as a picture (currently working on it)
 
 ## Contributing
 
@@ -277,8 +280,14 @@ Feel free to submit improvments / features / ideas by creating an issue to this 
 
 If you see any bugs, please create an issue with the details.
 
-If you wanna merge your improvments, please ensure your code respects the google's formatting style by running `beautify.bat` if you're on Windows or `beautify.sh` if you're on Linux. In both cases, you would need to install [yapf](https://github.com/google/yapf).
+If you wanna merge your improvments, please ensure your code respects the google's formatting style by running `beautify.bat` if you're on Windows or `beautify.sh` if you're on Linux.
 
 ## Changelog
 
-**06/03/2018** First version of the bot (**1.0.0**)
+**07/03/2018**
+
+- Updated requirements for correct installation
+- Fixed a little bug on `info` command which wasn't showing the complete Python version in some cases
+
+**06/03/2018**<br>
+First version of the bot (**1.0.0**)
