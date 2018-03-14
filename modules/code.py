@@ -320,7 +320,7 @@ class Code:
         """Adds a long field to the embed. Link a pastebin in case the field value is too long"""
         if parameter_name in result:
             if len(result[parameter_name]
-                  ) > 1022 or result[parameter_name].count("\n") > 20:
+                   ) > 1022 or result[parameter_name].count("\n") > 20:
                 url = await self.create_pastebin(field_name,
                                                  result[parameter_name])
                 delimiter = url.rfind("/")
@@ -395,19 +395,19 @@ class Code:
     async def code(self, ctx, *, code):
         """
         You can provide your code in two different ways:
-            - You can directly use Markdown syntax with your language identifier (use the list_identifiers to list all the language identifiers).
+            - You can directly use Markdown syntax with your language identifier (use list_identifiers to list all the language identifiers).
             - Submit the pastebin link to your code. (Specify the syntax highlighting) --> Use the parameter "code".
 
         If you want to explicitly specify your programming language, use the parameter "language".
-        Indeed, if you have several files and if this parameter is not specified, the programming language is deduced from the files extensions provided (see the list_extensions command).
+        Indeed, if you have several files and if this parameter is not specified, the programming language is deduced from the extensions of the provided files (see the list_extensions command).
 
-        If your program has to interact with the user with user inputs, you can specify these inputs using the parameter "input".
+        If your program has to interact with the user using inputs, you can specify them using the parameter "input".
         Each line of this parameter value corresponds to an user input.
 
-        If your program is sectioned into several files, you can provide provide them using the "code" parameter.
+        If your program is sectioned into several files, you can provide them using the "code" parameter.
         The content of each files must be hosted on pastebin.
         The first line corresponds to the "main" file, and will have a fixed name (see the list_main_file_names command to get these names).
-        Each following lines is composed of 2 elements: the file name and the pastebin link to the file content, respectively.
+        Each following line is composed of 2 elements : the file name and the pastebin link to the file content, respectively.
 
         If you want to explicitly specify an engine for running your code, you can use the "engine" parameter.
         You can list all the available engines by using the list_engines command.
