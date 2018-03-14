@@ -395,7 +395,7 @@ class Code:
     async def code(self, ctx, *, code):
         """
         You can provide your code in two different ways:
-            - You can directly use Markdown syntax with your language identifier (use the list_identifiers to list all the languages identifiers).
+            - You can directly use Markdown syntax with your language identifier (use the list_identifiers to list all the language identifiers).
             - Submit the pastebin link to your code. (Specify the syntax highlighting) --> Use the parameter "code".
 
         If you want to explicitly specify your programming language, use the parameter "language".
