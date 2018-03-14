@@ -2,6 +2,10 @@
 import json
 
 
+def split_message(message: str, step: int = 2000):
+    return [message[i:i + n] for i in range(0, len(message), step)]
+
+
 def load_json(filename: str):
     """Loads a json file"""
     with open(filename, encoding="utf-8", mode="r") as file:

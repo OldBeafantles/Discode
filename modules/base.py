@@ -17,6 +17,7 @@ from os import listdir
 import subprocess
 from datetime import datetime, timedelta
 import platform
+from modules.utils import utils
 
 
 class Base:
@@ -541,6 +542,10 @@ class Base:
                 if member.id not in known_members:
                     known_members.append(member.id)
         embed.add_field(name="Members", value=str(len(known_members)))
+        embed.add_field(
+            name="Development server",
+            value="Join it by clicking [here](https://" +
+            self.bot.dev_server_invitation_link + ")")
 
         await self.bot.send_message(
             destination=ctx.message.channel, embed=embed)
@@ -563,6 +568,39 @@ class Base:
             "\n" + "Bot's version: " + self.bot.version + "\n" +
             "Discord's version: " + discord.__version__ + "\n" +
             "Environment: " + os_infos)
+
+    @commands.command(pass_context=True)
+    async def bug(self, ctx, *, message):
+        """Reports a bug"""
+        try:
+            message = ctx.message.author.name + "#" + ctx.message.author.discriminator + \
+                "[" + ctx.message.author.id + "] reported a bug:\n" + message
+            messages = utils.split_message(message)
+            for msg in messages:
+                await self.bot.send_message(
+                    destination=self.bot.owner, content=msg)
+            await self.bot.say(
+                "Thanks for reporting this bug. I let it know to " +
+                self.bot.owner.name + "#" + self.bot.owner.discriminator + ".")
+        except Exception as e:
+            await self.bot.say(e)
+
+    @commands.command(pass_context=True)
+    async def improvement(self, ctx, *, message):
+        """Submits an improvement"""
+        try:
+            message = ctx.message.author.name + "#" + ctx.message.author.discriminator + \
+                "[" + ctx.message.author.id + \
+                "] submitted an improvement:\n" + message
+            messages = utils.split_message(message)
+            for msg in messages:
+                await self.bot.send_message(
+                    destination=self.bot.owner, content=msg)
+            await self.bot.say(
+                "Thanks for submitting this improvement. I let it know to " +
+                self.bot.owner.name + "#" + self.bot.owner.discriminator + ".")
+        except Exception as e:
+            await self.bot.say(e)
 
 
 def setup(bot):

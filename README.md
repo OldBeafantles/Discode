@@ -274,6 +274,11 @@ compiler-options -Wall
 - Allow use of most common libraries (like boost for C++)
 - Upload user request + result as a picture (currently working on it)
 
+## Todo
+
+- The `code` command must be refactored
+- Implement a security system to avoid being rate limited by the APIs
+
 ## Contributing
 
 Feel free to submit improvments / features / ideas by creating an issue to this project.
@@ -284,10 +289,21 @@ If you wanna merge your improvments, please ensure your code respects the google
 
 ## Changelog
 
+**14/03/2018**
+
+[**1.0.1**]
+
+- Fixed a bug on the command `code`. Using the parameter `language` was causing an error
+- Fixed a bug where a same module could be loaded several times 
+- Added the commands `bug` and `improvement` to submit an issue / an improvement
+- Added the invitation link to the development server in the `info` command
+- Added the help message for the `code` command
+
 **07/03/2018**
 
 - Updated requirements for correct installation
 - Fixed a little bug on `info` command which wasn't showing the complete Python version in some cases
 
-**06/03/2018**<br>
-First version of the bot (**1.0.0**)
+**06/03/2018**
+
+[**1.0.0**] First version of the bot

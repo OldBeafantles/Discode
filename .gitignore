@@ -15,3 +15,6 @@ data
 
 # The key for my VPS
 VPS_private_key.ppk
+
+# Some stuff for https://discordbots.org/
+discordbots_stuff

@@ -121,7 +121,7 @@ class CppBot(commands.Bot):
             utils.save_json(json_data, self.modules_file_path)
 
         print("\n\n")
-        self.modules = utils.load_json(self.modules_file_path)
+        self.modules = set(utils.load_json(self.modules_file_path))
         to_remove = []
         for mod in self.modules:
             module_path = "modules/" + mod + ".py"
@@ -142,8 +142,7 @@ class CppBot(commands.Bot):
                     to_remove.append(mod)
         for mod in to_remove:
             self.modules.remove(mod)
-        if to_remove:
-            utils.save_json(self.modules, self.modules_file_path)
+        utils.save_json(list(self.modules), self.modules_file_path)
 
     def init_data(self):
         if not os.path.isdir("data"):
@@ -185,7 +184,7 @@ class CppBot(commands.Bot):
         self.init_data()
         self.invite_link = ""
         self.modules = []
-        self.version = "1.0.0"
+        self.version = "1.0.1"
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.DEBUG)
         self.handler = logging.FileHandler(
@@ -198,6 +197,7 @@ class CppBot(commands.Bot):
         super().__init__(
             command_prefix=self.prefix, description=self.description, loop=loop)
         self.session = aiohttp.ClientSession(loop=loop)
+        self.dev_server_invitation_link = "discord.gg/UpYc98d"
         clear()
 
     async def close(self):
@@ -215,6 +215,9 @@ def run_bot():
     @bot.event
     async def on_ready():
         """Triggers when the bot just logged in"""
+
+        bot.owner = discord.utils.find(lambda m: m.id == bot.owner_id,
+                                       bot.get_all_members())
         print("Logged in as " + bot.user.name + "#" + bot.user.discriminator)
         print(str(len(bot.servers)) + " servers")
         print(str(len(set(bot.get_all_channels()))) + " channels")
