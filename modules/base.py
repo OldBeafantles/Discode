@@ -521,20 +521,16 @@ class Base:
         if msg != "":
             embed.add_field(name="Run time", value=msg)
         embed.add_field(name="Servers", value=str(len(self.bot.servers)))
-        embed.add_field(
-            name="Text channels",
-            value=str(
-                len([
-                    x for x in self.bot.get_all_channels()
-                    if x.type == discord.ChannelType.text
-                ])))
-        embed.add_field(
-            name="Voice channels",
-            value=str(
-                len([
-                    x for x in self.bot.get_all_channels()
-                    if x.type == discord.ChannelType.voice
-                ])))
+        channels = self.bot.get_all_channels()
+        nb_text_channels = 0
+        nb_voice_channels = 0
+        for channel in channels:
+            if channel.type == discord.ChannelType.text:
+                nb_text_channels += 1
+            elif channel.type == discord.ChannelType.voice:  # Why not else? In case a new type of channel
+                nb_voice_channels += 1
+        embed.add_field(name="Text channels", value=str(nb_text_channels))
+        embed.add_field(name="Voice channels", value=str(nb_voice_channels))
 
         known_members = []
         for server in self.bot.servers:

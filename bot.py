@@ -22,6 +22,10 @@ else:
         return os.system("clear")
 
 
+def _prefix_callable(bot, msg):
+    return ["<@!" + bot.user.id + "> ", "<@" + bot.user.id + "> ", bot.prefix]
+
+
 class CppBot(commands.Bot):
     """The bot class"""
 
@@ -37,7 +41,7 @@ class CppBot(commands.Bot):
                 "\n\nPlease put a little description for your bot (optionnal)\n> "
             )
             if description == "":
-                description = "A bot that can executes C++ code"
+                description = "A bot that runs code.\nIf you have any problem with Discode or if you just want to be in the development server, you can join it using this link: discord.gg/UpYc98d"
             owner_id = input("\n\nPlease put your ID:\n> ")
 
             json_data["token"] = token
@@ -184,7 +188,7 @@ class CppBot(commands.Bot):
         self.init_data()
         self.invite_link = ""
         self.modules = []
-        self.version = "1.0.1"
+        self.version = "1.0.2"
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.DEBUG)
         self.handler = logging.FileHandler(
@@ -195,7 +199,9 @@ class CppBot(commands.Bot):
         self.logger.addHandler(self.handler)
         self.launched_at = datetime.now()
         super().__init__(
-            command_prefix=self.prefix, description=self.description, loop=loop)
+            command_prefix=_prefix_callable,
+            description=self.description,
+            loop=loop)
         self.session = aiohttp.ClientSession(loop=loop)
         self.dev_server_invitation_link = "discord.gg/UpYc98d"
         clear()

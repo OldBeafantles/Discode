@@ -8,7 +8,7 @@ settings
 discord.log
 
 # Data files
-data
+data/code/pastebin_key.txt
 
 # Visual Studio Code configuration
 .vscode

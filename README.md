@@ -1,5 +1,8 @@
 # Discode
 
+[<img src="https://img.shields.io/badge/discord-py-blue.svg">](https://github.com/Rapptz/discord.py)
+[<img src="https://discordapp.com/api/guilds/417639452840558603/embed.png?style=shield">](https://discord.gg/UpYc98d)
+
 Discode is a Discord bot that runs code.
 
 It has been originally written for C++ support and it will remain the priority.
@@ -266,18 +269,18 @@ compiler-options -Wall
 
 ⚠️ **I don't work on this project on a regular basis but rather when I want to. Don't expect any precise date for these features / ideas to be released.** ⚠️
 
-- Gist support
-- More programming languages support (however, I would appreciate not to use several API for code evaluating)
-- Compilation / execution duration (wandbox's API doesn't give these info though...)
-- Language reference research
-- Beautify codes
-- Allow use of most common libraries (like boost for C++)
-- Upload user request + result as a picture (currently working on it)
+- Gist support.
+- More programming languages support (however, I would appreciate not to use several API for code evaluating).
+- Compilation / execution duration (wandbox's API doesn't give these info though...).
+- Language reference research.
+- Beautify codes.
+- Allow use of most common libraries (like boost for C++).
+- Upload user request + result as a picture (currently working on it).
 
 ## Todo
 
-- The `code` command must be refactored
-- Implement a security system to avoid being rate limited by the APIs
+- The `code` command must be refactored.
+- Implement a security system to avoid being rate limited by the APIs.
 
 ## Contributing
 
@@ -289,21 +292,31 @@ If you wanna merge your improvments, please ensure your code respects the google
 
 ## Changelog
 
+**29/04/2018**
+
+[**1.0.2**]
+
+- Fixed a bug where `'status'` was displayed when submitting some codes.
+- Fixed bot's description (which was stating that only C++ was supported).
+- You can now specify the engine you want to use using its ID (which can be displayed with the `[p]list_engines <language_name>`). Thanks PhirosWolf#5460 for this suggestion.
+- You can now mention the bot to invoke commands. This is an alias for the *classic* prefix which should avoid prefixes conflicts. Thanks sha_dryx#2417 for this suggestion.
+- Language identifiers now work with lowercase and uppercase (as Discord accepts both). Thanks sha_dryx#2417 for this suggestion.
+
 **14/03/2018**
 
 [**1.0.1**]
 
-- Fixed a bug on the command `code`. Using the parameter `language` was causing an error
-- Fixed a bug where a same module could be loaded several times 
-- Added the commands `bug` and `improvement` to submit an issue / an improvement
-- Added the invitation link to the development server in the `info` command
-- Added the help message for the `code` command
+- Fixed a bug on the command `code`. Using the parameter `language` was causing an error.
+- Fixed a bug where a same module could be loaded several times .
+- Added the commands `bug` and `improvement` to submit an issue / an improvement.
+- Added the invitation link to the development server in the `info` command.
+- Added the help message for the `code` command.
 
 **07/03/2018**
 
-- Updated requirements for correct installation
-- Fixed a little bug on `info` command which wasn't showing the complete Python version in some cases
+- Updated requirements for correct installation.
+- Fixed a little bug on `info` command which wasn't showing the complete Python version in some cases.
 
 **06/03/2018**
 
-[**1.0.0**] First version of the bot
+[**1.0.0**] First version of the bot.
