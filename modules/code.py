@@ -851,6 +851,34 @@ class Code:
                                  language_name, runtime_options)
         await self.bot.say("Done.")
 
+    @config.command(pass_context=True)
+    async def show(self, ctx):
+        """Shows your configuration"""
+        if ctx.message.author.id not in self.users_configuration:
+            await self.bot.say("You don't have any settings set.")
+            return
+        msg = "```Markdown\nSettings\n==========\n\n"
+        config = self.users_configuration[ctx.message.author.id]
+        for setting in config:
+            if setting == "output_only":
+                msg += "[Output](" + ("Only result"
+                                      if config[setting] == "OUTPUT_ONLY" else
+                                      "Everything") + ")\n"
+            elif setting == "engines":
+                msg += "<Engines>\n"
+                for language in config["engines"]:
+                    msg += "\t" + language + " --> " + config["engines"][language][1] + "\n"
+            elif setting == "compiler_options":
+                msg += "<Compiler options>\n"
+                for language in config["compiler_options"]:
+                    msg += "\t" + language + " --> " + config["compiler_options"][language] + "\n"
+            elif setting == "runtime_options":
+                msg += "<Runtime options>\n"
+                for language in config["runtime_options"]:
+                    msg += "\t" + language + " --> " + config["runtime_options"][language] + "\n"
+        msg += "```"
+        await self.bot.say(msg)
+
 
 def setup(bot):
     bot.add_cog(Code(bot))
