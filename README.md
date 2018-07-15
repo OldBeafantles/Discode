@@ -292,6 +292,15 @@ If you wanna merge your improvments, please ensure your code respects the google
 
 ## Changelog
 
+**15/07/2018**
+
+[**1.0.3**]
+
+- Added `invite` command. Thanks Starwort#6129 for the suggestion.
+- Added configuration system for each users. You can now configure your own default settings when submitting code.
+- Added the option `output_only` for the command `code`. With this option enabled, only the output of the programm will be displayed in the case there are no errors nor warnings. Thanks ViChyavIn#0299 for the suggestion.
+- Added a hint when the command `code` is not invoked correctly.
+
 **29/04/2018**
 
 [**1.0.2**]

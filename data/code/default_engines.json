@@ -1,34 +1,130 @@
 {
-    "Bash": ["bash", "bash"],
-    "C": ["gcc-c", "gcc-head-c"],
-    "C#": ["mono", "mono-head"],
-    "C++": ["gcc", "gcc-head"],
-    "CoffeeScript": ["coffeescript", "coffeescript-head"],
-    "Crystal": ["crystal", "crystal-head"],
-    "D": ["dmd", "dmd-head"],
-    "Elixir": ["elixir", "elixir-head"],
-    "Erlang": ["erlang", "erlang-head"],
-    "F#": ["fsharp", "fsharp-head"],
-    "Go": ["go", "go-head"],
-    "Groovy": ["groovy", "groovy-head"],
-    "Haskell": ["ghc", "ghc-head"],
-    "Java": ["openjdk", "openjdk-head"],
-    "JavaScript": ["nodejs", "nodejs-head"],
-    "Lazy K": ["lazyk", "lazyk"],
-    "Lisp": ["sbcl", "sbcl-head"],
-    "Lua": ["lua", "luajit-head"],
-    "Nim": ["nim", "nim-head"],
-    "OCaml": ["ocaml", "ocaml-head"],
-    "Pascal": ["fpc", "fpc-head"],
-    "Perl": ["perl", "perl-head"],
-    "PHP": ["php", "php-head"],
-    "Pony": ["pony", "pony-head"],
-    "Python": ["cpython", "cpython-head"],
-    "Rill": ["rill", "rill-head"],
-    "Ruby": ["ruby", "ruby-head"],
-    "Rust": ["rust", "rust-head"],
-    "Scala": ["scala", "scala-2.13.x"],
-    "SQL": ["sqlite", "sqlite-head"],
-    "Swift": ["swift", "swift-head"],
-    "Vim": ["vim", "vim-head"]
+    "Bash": [
+        "bash",
+        "bash"
+    ],
+    "C": [
+        "gcc-c",
+        "gcc-head-c"
+    ],
+    "C#": [
+        "mono",
+        "mono-head"
+    ],
+    "C++": [
+        "gcc",
+        "gcc-head"
+    ],
+    "CoffeeScript": [
+        "coffeescript",
+        "coffeescript-head"
+    ],
+    "Crystal": [
+        "crystal",
+        "crystal-head"
+    ],
+    "D": [
+        "dmd",
+        "dmd-head"
+    ],
+    "Elixir": [
+        "elixir",
+        "elixir-head"
+    ],
+    "Erlang": [
+        "erlang",
+        "erlang-head"
+    ],
+    "F#": [
+        "fsharp",
+        "fsharp-head"
+    ],
+    "Go": [
+        "go",
+        "go-head"
+    ],
+    "Groovy": [
+        "groovy",
+        "groovy-head"
+    ],
+    "Haskell": [
+        "ghc",
+        "ghc-head"
+    ],
+    "Java": [
+        "openjdk",
+        "openjdk-head"
+    ],
+    "JavaScript": [
+        "nodejs",
+        "nodejs-head"
+    ],
+    "Lazy_K": [
+        "lazyk",
+        "lazyk"
+    ],
+    "Lisp": [
+        "sbcl",
+        "sbcl-head"
+    ],
+    "Lua": [
+        "lua",
+        "luajit-head"
+    ],
+    "Nim": [
+        "nim",
+        "nim-head"
+    ],
+    "OCaml": [
+        "ocaml",
+        "ocaml-head"
+    ],
+    "Pascal": [
+        "fpc",
+        "fpc-head"
+    ],
+    "Perl": [
+        "perl",
+        "perl-head"
+    ],
+    "PHP": [
+        "php",
+        "php-head"
+    ],
+    "Pony": [
+        "pony",
+        "pony-head"
+    ],
+    "Python": [
+        "cpython",
+        "cpython-head"
+    ],
+    "Rill": [
+        "rill",
+        "rill-head"
+    ],
+    "Ruby": [
+        "ruby",
+        "ruby-head"
+    ],
+    "Rust": [
+        "rust",
+        "rust-head"
+    ],
+    "Scala": [
+        "scala",
+        "scala-2.13.x"
+    ],
+    "SQL": [
+        "sqlite",
+        "sqlite-head"
+    ],
+    "Swift": [
+        "swift",
+        "swift-head"
+    ],
+    "Vim": [
+        "vim",
+        "vim-head"
+    ]
 }

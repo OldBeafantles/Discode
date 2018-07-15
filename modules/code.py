@@ -17,16 +17,32 @@ import traceback
 class Code:
     """Code module"""
 
+    async def send_cmd_help(self, ctx, message: str = ""):
+        if ctx.invoked_subcommand:
+            pages = self.bot.formatter.format_help_for(ctx,
+                                                       ctx.invoked_subcommand)
+            for page in pages:
+                await self.bot.send_message(ctx.message.channel,
+                                            message + "\n" + page)
+        else:
+            pages = self.bot.formatter.format_help_for(ctx, ctx.command)
+            for page in pages:
+                await self.bot.send_message(ctx.message.channel,
+                                            message + "\n" + page)
+
     def __init__(self, bot):
         self.bot = bot
         self.timeout = 15
         self.data_folder_path = "data/code/"
         self.pastebin_api_key_file_path = self.data_folder_path + "pastebin_key.txt"
+        self.users_configuration_path = self.data_folder_path + "users_configuration.json"
         self.languages_identifiers_file_path = self.data_folder_path + "languages_identifiers.json"
         self.default_engines_file_path = self.data_folder_path + "default_engines.json"
         self.languages_images_file_path = self.data_folder_path + "languages_images.json"
         self.languages_files_extensions_file_path = self.data_folder_path + "languages_files_extensions.json"
+        self.users_configuration = {}
         self.load_pastebin_api_key()
+        self.load_users_configuration()
 
         # Elements are list in case some extensions can be used.
         # Lazy K isn't supported yet (as this language use the character `,
@@ -38,7 +54,8 @@ class Code:
         self.default_engines = utils.load_json(self.default_engines_file_path)
 
         # Languages logos
-        self.languages_images = utils.load_json(self.languages_images_file_path)
+        self.languages_images = utils.load_json(
+            self.languages_images_file_path)
 
         # Languages files extensions
         # https://fileinfo.com/filetypes/developer
@@ -50,6 +67,18 @@ class Code:
 
         self.configuration = {}
         self.load_info()
+
+    def load_users_configuration(self):
+        """Loads the users configuration"""
+        if not os.path.exists(self.users_configuration_path):
+            if not os.path.isdir("data/code"):
+                os.makedirs("data/code")
+
+            utils.save_json(self.users_configuration,
+                            self.users_configuration_path)
+        else:
+            self.users_configuration = utils.load_json(
+                self.users_configuration_path)
 
     def load_pastebin_api_key(self):
         """Loads the pastebin api key"""
@@ -112,7 +141,8 @@ class Code:
                 # We delete redundant info
                 # ------------------------
                 del self.configuration[language][template][name]["name"]
-                del self.configuration[language][template][name]["display-name"]
+                del self.configuration[language][template][name][
+                    "display-name"]
                 del self.configuration[language][template][name]["language"]
                 del self.configuration[language][template][name]["templates"]
                 # I don't know what "provider" means but as this attribute is always
@@ -160,7 +190,7 @@ class Code:
         """Adds a long field to the embed. Link a pastebin in case the field value is too long"""
         if parameter_name in result:
             if len(result[parameter_name]
-                  ) > 1022 or result[parameter_name].count("\n") > 20:
+                   ) > 1022 or result[parameter_name].count("\n") > 20:
                 url = await self.create_pastebin(field_name,
                                                  result[parameter_name])
                 delimiter = url.rfind("/")
@@ -256,6 +286,8 @@ class Code:
 
         You can add compilation / runtime options by using the parameters "compiler-options" and "runtime-options".
 
+        You can add the "output_only" parameter to only get the output result of the code (only if the code has no errors). 
+
         The values of the parameters "code" and "input" must be surrounded by the character `.
 
         The bot supports 32 programming languages, which can be listed using the list_languages command.
@@ -314,7 +346,7 @@ class Code:
                 parameter_name = line
             if parameter_name not in [
                     "engine", "code", "compiler-options", "runtime-options",
-                    "input", "language"
+                    "input", "language", "output_only"
             ]:
                 await self.bot.say(
                     "Invalid parameter `" + parameter_name +
@@ -347,6 +379,8 @@ class Code:
                             "Invalid input parameter format.\nCheck out input format by typing `"
                             + self.bot.prefix + "help code`.")
                         return
+                elif parameter_name == "output_only":
+                    parameter_value = True
                 elif parameter_name == "code":
                     begin = line.find("`")
                     if begin == -1:
@@ -421,7 +455,8 @@ class Code:
                                     "Invalid file name format.\nThere is no file extension.\nCheck out code format by typing `"
                                     + self.bot.prefix + "help code`.")
                                 return
-                            file_extension = file_name[extension_delimiter + 1:]
+                            file_extension = file_name[
+                                extension_delimiter + 1:]
                             for language in self.languages_files_extensions:
                                 if file_extension.lower(
                                 ) in self.languages_files_extensions[language]:
@@ -429,7 +464,10 @@ class Code:
                                         supposed_languages[language] += 1
                                     else:
                                         supposed_languages[language] = 1
-                        new_value.append({"file": file_name, "code": file_code})
+                        new_value.append({
+                            "file": file_name,
+                            "code": file_code
+                        })
                     if supposed_languages:
                         supposed_language = sorted(
                             supposed_languages.items(),
@@ -520,8 +558,20 @@ class Code:
                     "list_engines " + code_language + "`")
                 return
         else:
-            engine_template_used = self.default_engines[code_language][0]
-            parameters["engine"] = self.default_engines[code_language][1]
+            if ctx.message.author.id in self.users_configuration and "engines" in self.users_configuration[ctx.
+                                                                                                           message.
+                                                                                                           author.
+                                                                                                           id] and code_language in self.users_configuration[ctx.
+                                                                                                                                                             message.
+                                                                                                                                                             author.
+                                                                                                                                                             id]["engines"]:
+                engine_template_used = self.users_configuration[
+                    ctx.message.author.id]["engines"][code_language][0]
+                parameters["engine"] = self.users_configuration[
+                    ctx.message.author.id]["engines"][code_language][1]
+            else:
+                engine_template_used = self.default_engines[code_language][0]
+                parameters["engine"] = self.default_engines[code_language][1]
         if "compiler-options" in parameters and not self.configuration[code_language][engine_template_used][parameters["engine"]]["compiler-option-raw"]:
             await self.bot.say(
                 "There is no options available for compilation using `" +
@@ -532,33 +582,69 @@ class Code:
                 "There is no options available for runtime execution using `" +
                 parameters["engine"] + "`.\nIgnoring these options.")
             del parameters["runtime-options"]
+        if "output_only" not in parameters:
+            if ctx.message.author.id in self.users_configuration and "output_only" in self.users_configuration[ctx.
+                                                                                                               message.
+                                                                                                               author.
+                                                                                                               id]:
+                parameters["output_only"] = self.users_configuration[
+                    ctx.message.author.id]["output_only"]
+            else:
+                parameters["output_only"] = False
+        if "compiler_options" not in parameters:
+            if ctx.message.author.id in self.users_configuration and "compiler_options" in self.users_configuration[ctx.
+                                                                                                                    message.
+                                                                                                                    author.
+                                                                                                                    id] and code_language in self.users_configuration[ctx.
+                                                                                                                                                                      message.
+                                                                                                                                                                      author.
+                                                                                                                                                                      id]["compiler_options"]:
+                parameters["compiler-options"] = self.users_configuration[
+                    ctx.message.author.id]["compiler_options"][code_language]
+            else:
+                parameters["compiler-options"] = ""
+        if "runtime_options" not in parameters:
+            if ctx.message.author.id in self.users_configuration and "runtime_options" in self.users_configuration[ctx.
+                                                                                                                   message.
+                                                                                                                   author.
+                                                                                                                   id] and code_language in self.users_configuration[ctx.
+                                                                                                                                                                     message.
+                                                                                                                                                                     author.
+                                                                                                                                                                     id]["runtime_options"]:
+                parameters["runtime-options"] = self.users_configuration[
+                    ctx.message.author.id]["runtime_options"][code_language]
+            else:
+                parameters["runtime-options"] = ""
+
         request = {
-            "code":
-            parameters["code"],
-            "codes":
-            parameters["codes"] if "codes" in parameters else [],
-            "compiler":
-            parameters["engine"],
-            "save":
-            True,
-            "stdin":
-            parameters["input"] if "input" in parameters else "",
-            "compiler-option-raw":
-            parameters["compiler-options"]
-            if "compiler-options" in parameters else "",
-            "runtime-option-raw":
-            parameters["runtime-options"]
-            if "runtime-options" in parameters else ""
+            "code": parameters["code"],
+            "codes": parameters["codes"] if "codes" in parameters else [],
+            "compiler": parameters["engine"],
+            "save": True,
+            "stdin": parameters["input"] if "input" in parameters else "",
+            "compiler-option-raw": parameters["compiler-options"],
+            "runtime-option-raw": parameters["runtime-options"]
         }
         result = await self.post_fetch("https://wandbox.org/api/compile.json",
                                        request)
-        embed = await self.create_embed_result(
-            ctx, code_language, engine_template_used, parameters["engine"],
-            (parameters["compiler-options"]
-             if "compiler-options" in parameters else "") +
-            (parameters["runtime-options"]
-             if "runtime-options" in parameters else ""), result)
-        await self.bot.say(embed=embed)
+
+        if not parameters["output_only"] or "compiler_error" in result or "program_error" in result:
+            embed = await self.create_embed_result(
+                ctx, code_language, engine_template_used, parameters["engine"],
+                (parameters["compiler-options"]
+                 if "compiler-options" in parameters else "") +
+                (parameters["runtime-options"]
+                 if "runtime-options" in parameters else ""), result)
+            await self.bot.say(embed=embed)
+        else:
+            msg = ""
+            if len(result["program_output"]
+                   ) > 1998 or result["program_output"].count('\n') > 20:
+                msg = "Output here: <" + await self.create_pastebin(
+                    "Output", result["program_output"]) + '>'
+            else:
+                msg = '`' + result["program_output"] + '`'
+            await self.bot.say(msg)
 
     @commands.command(pass_context=True)
     async def list_languages(self, ctx):
@@ -624,6 +710,146 @@ class Code:
                 ("." if extension != "" else "") + extension + "\n"
         msg += "```"
         await self.bot.say(msg)
+
+    def set_user_config(self, user: discord.Member, attribute: str, value):
+        if user.id not in self.users_configuration:
+            self.users_configuration[user.id] = {}
+        self.users_configuration[user.id][attribute] = value
+        utils.save_json(self.users_configuration,
+                        self.users_configuration_path)
+
+    def set_user_sub_config(self, user: discord.Member, sub_config_name: str,
+                            attribute: str, value):
+        if user.id not in self.users_configuration:
+            self.users_configuration[user.id] = {}
+        if sub_config_name not in self.users_configuration[user.id]:
+            self.users_configuration[user.id][sub_config_name] = {}
+        self.users_configuration[user.id][sub_config_name][attribute] = value
+        utils.save_json(self.users_configuration,
+                        self.users_configuration_path)
+
+    @commands.group(pass_context=True)
+    async def config(self, ctx):
+        """Configures your default settings"""
+        if ctx.invoked_subcommand is None:
+            await self.send_cmd_help(ctx)
+
+    @config.command(pass_context=True)
+    async def output(self, ctx, output_mode: str = ""):
+        """Configures output of the bot
+            OUTPUT_ONLY to get only the output of your code (except if there are warnings or errors)
+            EVERYTHING to show all info
+        """
+        if output_mode not in ["OUTPUT_ONLY", "EVERYTHING"]:
+            await self.bot.say(
+                "Please choose one of the following option: EVERYTHING / OUTPUT_ONLY."
+            )
+        else:
+            self.set_user_config(ctx.message.author, "output_only",
+                                 (True
+                                  if output_mode == "OUTPUT_ONLY" else False))
+            await self.bot.say("Done.")
+
+    @config.command(pass_context=True)
+    async def reset(self, ctx):
+        """Resets your configuration"""
+        if ctx.message.author.id in self.users_configuration:
+            del self.users_configuration[ctx.message.author.id]
+            utils.save_json(self.users_configuration,
+                            self.users_configuration_path)
+            await self.bot.say("Done.")
+        else:
+            await self.bot.say("You hadn't any configured settings.")
+
+    @config.command(pass_context=True)
+    async def engine(self, ctx, language_name: str = "",
+                     engine_name: str = ""):
+        """Specifies default engine for a specific language"""
+        if not language_name:
+            await self.bot.say("Please specify a language.")
+            return
+        if not engine_name:
+            await self.bot.say("Please specify an engine.")
+            return
+        found = False
+        for language_identifier in self.languages_identifiers:
+            if language_identifier.upper() == language_name.upper():
+                language_name = language_identifier
+                found = True
+        if not found:
+            await self.bot.say(
+                "`" + language_name +
+                "` is not a correct language name / isn't available for the bot.\nTo list all the available languages, please use `"
+                + self.bot.prefix + "list_languages`.")
+            return
+        engine_template_name = None
+        for engine_template in self.configuration[language_name]:
+            if engine_name in self.configuration[language_name][
+                    engine_template]:
+                engine_template_name = engine_template
+                break
+
+        if not engine_template_name:
+            await self.bot.say(
+                "`" + engine_name + "` is not a correct engine for " +
+                language_name +
+                " / isn't available for the bot.\nTo list all the available engine for "
+                + language_name + ", please use `" + self.bot.prefix +
+                "list_engines " + language_name + "`")
+            return
+        self.set_user_sub_config(ctx.message.author, "engines", language_name,
+                                 [engine_template_name, engine_name])
+        await self.bot.say("Done.")
+
+    @config.command(pass_context=True)
+    async def compiler_options(self,
+                               ctx,
+                               language_name: str = "",
+                               *,
+                               compiler_options):
+        """Configures your default compilation options for a specifig language"""
+        if not language_name:
+            await self.bot.say("Please specify a language.")
+            return
+        found = False
+        for language_identifier in self.languages_identifiers:
+            if language_identifier.upper() == language_name.upper():
+                language_name = language_identifier
+                found = True
+        if not found:
+            await self.bot.say(
+                "`" + language_name +
+                "` is not a correct language name / isn't available for the bot.\nTo list all the available languages, please use `"
+                + self.bot.prefix + "list_languages`.")
+            return
+        self.set_user_sub_config(ctx.message.author, "compiler_options",
+                                 language_name, compiler_options)
+        await self.bot.say("Done.")
+
+    @config.command(pass_context=True)
+    async def runtime_options(self,
+                              ctx,
+                              language_name: str = "",
+                              *,
+                              runtime_options):
+        """Configures your default runtime options for a specifig language"""
+        if not language_name:
+            await self.bot.say("Please specify a language.")
+            return
+        found = False
+        for language_identifier in self.languages_identifiers:
+            if language_identifier.upper() == language_name.upper():
+                language_name = language_identifier
+                found = True
+        if not found:
+            await self.bot.say(
+                "`" + language_name +
+                "` is not a correct language name / isn't available for the bot.\nTo list all the available languages, please use `"
+                + self.bot.prefix + "list_languages`.")
+            return
+        self.set_user_sub_config(ctx.message.author, "runtime_options",
+                                 language_name, runtime_options)
+        await self.bot.say("Done.")
 
 
 def setup(bot):

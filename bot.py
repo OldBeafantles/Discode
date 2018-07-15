@@ -26,7 +26,7 @@ def _prefix_callable(bot, msg):
     return ["<@!" + bot.user.id + "> ", "<@" + bot.user.id + "> ", bot.prefix]
 
 
-class CppBot(commands.Bot):
+class Discode(commands.Bot):
     """The bot class"""
 
     def load_config(self):
@@ -152,18 +152,6 @@ class CppBot(commands.Bot):
         if not os.path.isdir("data"):
             os.makedirs("data")
 
-    async def send_cmd_help(self, ctx, message: str):
-        if ctx.invoked_subcommand:
-            pages = self.formatter.format_help_for(ctx, ctx.invoked_subcommand)
-            for page in pages:
-                await self.send_message(ctx.message.channel,
-                                        message + "\n" + page)
-        else:
-            pages = self.formatter.format_help_for(ctx, ctx.command)
-            for page in pages:
-                await self.send_message(ctx.message.channel,
-                                        message + "\n" + page)
-
     def __init__(self, loop):
 
         clear()
@@ -188,7 +176,7 @@ class CppBot(commands.Bot):
         self.init_data()
         self.invite_link = ""
         self.modules = []
-        self.version = "1.0.2"
+        self.version = "1.0.3"
         self.logger = logging.getLogger('discord')
         self.logger.setLevel(logging.DEBUG)
         self.handler = logging.FileHandler(
@@ -216,7 +204,7 @@ def run_bot():
 
     loop = asyncio.get_event_loop()
 
-    bot = CppBot(loop)
+    bot = Discode(loop)
 
     @bot.event
     async def on_ready():
@@ -244,7 +232,12 @@ def run_bot():
     async def on_message(message):
         """Triggers when the bot reads a new message"""
         if message.author.id not in bot.blacklist:
-            await bot.process_commands(message)
+            if message.content.startswith(bot.prefix + "code```"):
+                await bot.send_message(
+                    destination=message.channel,
+                    content="https://i.imgur.com/eGMJXqg.png")
+            else:
+                await bot.process_commands(message)
 
     @bot.event
     async def on_command_error(error, ctx):

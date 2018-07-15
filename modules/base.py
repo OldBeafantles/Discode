@@ -61,6 +61,13 @@ class Base:
             self.save_infos()
             await asyncio.sleep(60)
 
+    @commands.command()
+    async def invite(self):
+        """Gets invitation link"""
+        await self.bot.say(
+            "If you want to invite the bot to your server, you can use this link: <"
+            + self.bot.invite_link + ">")
+
     @commands.command(pass_context=True, name='eval')
     @checks.is_owner()
     async def eval(self, ctx, *, body: str):
