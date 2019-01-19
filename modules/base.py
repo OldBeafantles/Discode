@@ -62,13 +62,13 @@ class Base:
             await asyncio.sleep(60)
 
     @commands.command()
-    async def invite(self):
+    async def invite(self, ctx):
         """Gets invitation link"""
-        await self.bot.say(
+        await ctx.channel.send(
             "If you want to invite the bot to your server, you can use this link: <"
             + self.bot.invite_link + ">")
 
-    @commands.command(pass_context=True, name='eval')
+    @commands.command(name='eval')
     @checks.is_owner()
     async def eval(self, ctx, *, body: str):
         """Evaluates a code"""
@@ -78,7 +78,7 @@ class Base:
             'ctx': ctx,
             'channel': ctx.message.channel,
             'author': ctx.message.author,
-            'server': ctx.message.server,
+            'server': ctx.message.guild,
             'message': ctx.message,
             '_': self.last_result
         }
@@ -93,8 +93,8 @@ class Base:
         try:
             exec(to_compile, env)
         except Exception as e:
-            return await self.bot.say(f'```py\n{e.__class__.__name__}: {e}\n```'
-                                     )
+            return await ctx.channel.send(
+                f'```py\n{e.__class__.__name__}: {e}\n```')
 
         func = env['func']
         try:
@@ -102,7 +102,8 @@ class Base:
                 ret = await func()
         except Exception as e:
             value = stdout.getvalue()
-            await self.bot.say(f'```py\n{value}{traceback.format_exc()}\n```')
+            await ctx.channel.send(
+                f'```py\n{value}{traceback.format_exc()}\n```')
         else:
             value = stdout.getvalue()
             try:
@@ -112,12 +113,12 @@ class Base:
 
             if ret is None:
                 if value:
-                    await self.bot.say(f'```py\n{value}\n```')
+                    await ctx.channel.send(f'```py\n{value}\n```')
             else:
                 self._last_result = ret
-                await self.bot.say(f'```py\n{value}{ret}\n```')
+                await ctx.channel.send(f'```py\n{value}{ret}\n```')
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @checks.is_owner()
     async def repl(self, ctx):
         """Launches an interactive REPL session."""
@@ -125,20 +126,20 @@ class Base:
             'ctx': ctx,
             'bot': self.bot,
             'message': ctx.message,
-            'server': ctx.message.server,
+            'server': ctx.message.guild,
             'channel': ctx.message.channel,
             'author': ctx.message.author,
             '_': None,
         }
 
         if ctx.message.channel.id in self.sessions:
-            await self.bot.say(
+            await ctx.channel.send(
                 'Already running a REPL session in this channel. Exit it with `quit`.'
             )
             return
 
         self.sessions.add(ctx.message.channel.id)
-        await self.bot.say(
+        await ctx.channel.send(
             'Enter code to execute or evaluate. `exit()` or `quit` to exit.')
 
         def check(m):
@@ -148,17 +149,17 @@ class Base:
 
         while True:
             try:
-                response = await self.bot.wait_for_message(
-                    check=check, timeout=10.0 * 60.0)
+                response = await self.bot.wait_for(
+                    'message', check=check, timeout=10.0 * 60.0)
             except asyncio.TimeoutError:
-                await self.bot.say('Exiting REPL session.')
+                await ctx.channel.send('Exiting REPL session.')
                 self.sessions.remove(ctx.message.channel.id)
                 break
 
             cleaned = self.cleanup_code(response.content)
 
             if cleaned in ('quit', 'exit', 'exit()'):
-                await self.bot.say('Exiting.')
+                await ctx.channel.send('Exiting.')
                 self.sessions.remove(ctx.message.channel.id)
                 return
 
@@ -176,7 +177,7 @@ class Base:
                 try:
                     code = compile(cleaned, '<repl session>', 'exec')
                 except SyntaxError as e:
-                    await self.bot.say(self.get_syntax_error(e))
+                    await ctx.channel.send(self.get_syntax_error(e))
                     continue
 
             variables['message'] = response
@@ -203,17 +204,17 @@ class Base:
             try:
                 if fmt is not None:
                     if len(fmt) > 2000:
-                        await self.bot.say('Content too big to be printed.')
+                        await ctx.channel.send('Content too big to be printed.')
                     else:
-                        await self.bot.say(fmt)
+                        await ctx.channel.send(fmt)
             except discord.Forbidden:
                 pass
             except discord.HTTPException as e:
-                await self.bot.say(f'Unexpected error: `{e}`')
+                await ctx.channel.send(f'Unexpected error: `{e}`')
 
     @commands.command()
     @checks.is_owner()
-    async def load(self, module: str):
+    async def load(self, ctx, module: str):
         """Loads a module."""
         try:
             self.bot.load_extension("modules." + module)
@@ -223,14 +224,14 @@ class Base:
                                 self.bot.modules_file_path)
         except Exception:
             tb = traceback.format_exc()
-            await self.bot.say("\U0001f52b\n```" + tb + "```")
+            await ctx.channel.send("\U0001f52b\n```" + tb + "```")
         else:
-            await self.bot.say('\U0001f44c')
+            await ctx.channel.send('\U0001f44c')
             print(module + " loaded.")
 
     @commands.command()
     @checks.is_owner()
-    async def unload(self, module: str):
+    async def unload(self, ctx, module: str):
         """Unloads a module."""
         if module in self.bot.loaded_modules:
             try:
@@ -240,16 +241,16 @@ class Base:
                                 self.bot.modules_file_path)
             except Exception:
                 tb = traceback.format_exc()
-                await self.bot.say("\U0001f52b\n```" + tb + "```")
+                await ctx.channel.send("\U0001f52b\n```" + tb + "```")
             else:
-                await self.bot.say('\U0001f44c')
+                await ctx.channel.send('\U0001f44c')
                 print(module + " unloaded.")
         else:
-            await self.bot.say("This module isn't even loaded")
+            await ctx.channel.send("This module isn't even loaded")
 
     @commands.command()
     @checks.is_owner()
-    async def reload(self, module: str):
+    async def reload(self, ctx, module: str):
         """Reloads a module."""
         try:
             if module in self.bot.loaded_modules:
@@ -263,14 +264,14 @@ class Base:
             utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception:
             tb = traceback.format_exc()
-            await self.bot.say("\U0001f52b\n```" + tb + "```")
+            await ctx.channel.send("\U0001f52b\n```" + tb + "```")
         else:
-            await self.bot.say('\U0001f44c')
+            await ctx.channel.send('\U0001f44c')
             print(module + " reloaded.")
 
     @commands.command()
     @checks.is_owner()
-    async def list_modules(self):
+    async def list_modules(self, ctx):
         """Lists all the modules."""
         files = [f[:-3] for f in listdir("modules/") if f[-3:] == ".py"]
         msg = "Modules\n---------------------\n\n"
@@ -280,19 +281,19 @@ class Base:
                 msg += "Loaded :white_check_mark:\n"
             else:
                 msg += "Not loaded :x:\n"
-        await self.bot.say(msg)
+        await ctx.channel.send(msg)
 
     @commands.command()
     @checks.is_owner()
-    async def shutdown(self):
+    async def shutdown(self, ctx):
         """Shutdowns the bot"""
         self.save_infos()
-        await self.bot.say("Bye! :wave:")
+        await ctx.channel.send("Bye! :wave:")
         await self.bot.logout()
 
     @commands.command()
     @checks.is_owner()
-    async def set_avatar(self, avatar_link: str):
+    async def set_avatar(self, ctx, avatar_link: str):
         """Sets bot's avatar
         Parameters:
             avatar_link: The link of the the picture which will become the new bot's avatar
@@ -301,37 +302,37 @@ class Base:
         r = requests.get(avatar_link)
         if r.status_code == 200:
             try:
-                await self.bot.edit_profile(avatar=r.content)
-                await self.bot.say("Done!")
-            except discord.HTTPException:
-                await self.bot.say("HTTP Exception")
+                await self.bot.user.edit(avatar=r.content)
+                await ctx.channel.send("Done!")
+            except discord.HTTPException as e:
+                await ctx.channel.send(e)
             except discord.InvalidArgument:
-                await self.bot.say("Wrong image format")
+                await ctx.channel.send("Wrong image format")
             except requests.exceptions.MissingSchema:
-                await self.bot.say("Invalid URL")
+                await ctx.channel.send("Invalid URL")
         else:
-            await self.bot.say(
+            await ctx.channel.send(
                 "Error " + str(r.status_code) +
                 ": The link must be incorrect, " +
                 "make sure the link finishes with `.png`, `.jpg`, `.jpeg`, etc")
 
     @commands.command()
     @checks.is_owner()
-    async def set_name(self, *name):
+    async def set_name(self, ctx, *name):
         """Sets bot's name
         Parameters:
             *name: The name you want to set for the bot
 
         Example: [p]set_name Beaftek's bot"""
         try:
-            await self.bot.edit_profile(username=" ".join(name))
-            await self.bot.say("Done!")
-        except discord.HTTPException:
-            await self.bot.say("HTTP Exception")
-        except discord.InvalidArgument:
-            await self.bot.say("Wrong name format (too long?)")
+            await self.bot.user.edit(username=" ".join(name))
+            await ctx.channel.send("Done!")
+        except discord.HTTPException as e:
+            await ctx.channel.send(e)
+        except discord.InvalidArgument as e:
+            await ctx.channel.send(e)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @checks.is_owner()
     async def set_nickname(self, ctx, *nickname):
         """Sets bot's nickname
@@ -341,20 +342,17 @@ class Base:
 
         Example: [p]set_nickname myGreatNickname"""
         try:
-            await self.bot.change_nickname(
-                discord.utils.find(lambda x: x.id == self.bot.user.id,
-                                   ctx.message.server.members),
-                " ".join(nickname))
-            await self.bot.say("Done!")
+            await ctx.me.edit(nick=" ".join(nickname))
+            await ctx.channel.send("Done!")
         except discord.Forbidden:
-            await self.bot.say(
+            await ctx.channel.send(
                 "I'm not permitted to change my nickname in this server.")
-        except discord.HTTPException:
-            await self.bot.say("HTTP Exception")
+        except discord.HTTPException as e:
+            await ctx.channel.send(e)
 
     @commands.command()
     @checks.is_owner()
-    async def set_game(self, *game):
+    async def set_game(self, ctx, *game):
         """Sets bot's game
         Parameters:
             *game:  The game you want to set for the bot
@@ -364,16 +362,16 @@ class Base:
         try:
             if game:
                 await self.bot.change_presence(
-                    game=discord.Game(name=" ".join(game), type=0))
+                    activity=discord.Game(" ".join(game)))
             else:
-                await self.bot.change_presence(game=None)
-            await self.bot.say("Done! :ok_hand:")
-        except discord.InvalidArgument:
-            await self.bot.say("Wrong game name format (too long?)")
+                await self.bot.change_presence()
+            await ctx.channel.send("Done! :ok_hand:")
+        except discord.InvalidArgument as e:
+            await ctx.channel.send(e)
 
     @commands.command()
     @checks.is_owner()
-    async def set_stream(self, stream_link: str = "", *game):
+    async def set_stream(self, ctx, stream_link: str = "", *game):
         """Sets bot's stream name
         Parameters:
             stream_link: the link to the stream you want to set for the bot
@@ -385,20 +383,21 @@ class Base:
             if stream_link != "":
                 if stream_link.startswith("https://www.twitch.tv/"):
                     await self.bot.change_presence(
-                        game=discord.Game(
-                            name=" ".join(game), type=1, url=stream_link))
-                    await self.bot.say("Done! :ok_hand:")
+                        activity=discord.Streaming(
+                            name=" ".join(game), url=stream_link))
+                    await ctx.channel.send("Done! :ok_hand:")
                 else:
-                    await self.bot.say("Please provide a correct stream link")
+                    await ctx.channel.send(
+                        "Please provide a correct stream link")
             else:
-                await self.bot.change_presence(game=None)
-                await self.bot.say("Done! :ok_hand:")
+                await self.bot.change_presence()
+                await ctx.channel.send("Done! :ok_hand:")
         except discord.InvalidArgument:
-            await self.bot.say("Wrong game name format (too long?)")
+            await ctx.channel.send("Wrong game name format (too long?)")
 
     @commands.command()
     @checks.is_owner()
-    async def set_status(self, status: str = "online"):
+    async def set_status(self, ctx, status: str = "online"):
         """Sets bot's status
         Parameters:
             status: the status you want to set for the bot
@@ -419,84 +418,81 @@ class Base:
         }
         if status in ["online", "idle", "dnd", "offline"]:
             await self.bot.change_presence(status=statutes[status])
-            await self.bot.say("Done! :ok_hand:")
+            await ctx.channel.send("Done! :ok_hand:")
         else:
-            await self.bot.say(
+            await ctx.channel.send(
                 "Please provide a correct status!\n" +
                 "You can check available statutes typing `[p]help set_status`.")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @checks.is_owner()
     async def list_servers(self, ctx):
         """Lists bot's server and ask if you want to leave one"""
         msg = "```Markdown\nServers\n==================\n\n"
         i = 1
         servers = []
-        for server in self.bot.servers:
+        for server in self.bot.guilds:
             msg += "[" + str(i) + "](" + server.name + ")\n"
             i += 1
             servers.append(server.id)
         msg += "```\nIf you want me to leave one of these servers, just type its number."
-        await self.bot.say(msg)
-        answer = await self.bot.wait_for_message(
-            timeout=180, author=ctx.message.author, channel=ctx.message.channel)
+        await ctx.channel.send(msg)
+
+        def check_1(m):
+            return m.author == ctx.message.author and m.channel == ctx.message.channel
+
+        answer = await self.bot.wait_for('message', timeout=180, check=check_1)
         if answer:
             try:
                 index = int(answer.content)
                 server_to_leave = discord.utils.find(
-                    lambda x: x.id == servers[index - 1], self.bot.servers)
-                await self.bot.say(
+                    lambda x: x.id == servers[index - 1], self.bot.guilds)
+                await ctx.channel.send(
                     "If you want to leave this server, type `yes`!")
 
-                def check(msg):
-                    return msg.content.lower() == "yes"
+                def check_2(msg):
+                    return msg.author == ctx.message.author and msg.channel == ctx.message.channel
 
-                answer = await self.bot.wait_for_message(
-                    timeout=60,
-                    author=ctx.message.author,
-                    channel=ctx.message.channel,
-                    check=check)
-                if answer:
+                answer = await self.bot.wait_for(
+                    'message', timeout=60, check=check_2)
+                if answer.content.lower() == "yes":
                     try:
-                        await self.bot.leave_server(server_to_leave)
-                        await self.bot.say("Done! :ok_hand:")
+                        await server_to_leave.leave()
+                        await ctx.channel.send("Done! :ok_hand:")
                     except discord.HTTPException:
-                        await self.bot.say("HTTP Error")
+                        await ctx.channel.send("HTTP Error")
             except ValueError:
                 pass
 
-    @commands.command(pass_context=True)
+    @commands.command()
     @checks.is_owner()
     async def leave_server(self, ctx):
         """Leaves the current server"""
-        await self.bot.say("If you want to leave this server, type `yes`!")
+        await ctx.channel.send("If you want to leave this server, type `yes`!")
 
         def check(msg):
-            return msg.content.lower() == "yes"
+            return msg.author == ctx.message.author and msg.channel == ctx.message.channel
 
-        answer = await self.bot.wait_for_message(
-            timeout=60,
-            author=ctx.message.author,
-            channel=ctx.message.channel,
-            check=check)
-        if answer:
+        answer = await self.bot.wait_for('message', timeout=60, check=check)
+        if answer.content.lower() == "yes":
             try:
-                await self.bot.say("Bye! :wave:")
-                await self.bot.leave_server(ctx.message.server)
+                await ctx.channel.send("Bye! :wave:")
+                await ctx.message.guild.leave()
             except discord.HTTPException:
-                await self.bot.say("HTTP Error")
+                await ctx.channel.send("HTTP Error")
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def info(self, ctx):
         """Show bot's info"""
         embed = discord.Embed(title="Bot's info", type="rich embed")
         embed.set_thumbnail(
-            url=discord.utils.find(lambda x: x.id == self.bot.user.id,
-                                   ctx.message.server.members).avatar_url)
+            url=discord.utils.find(lambda x: x.id == self.bot.user.id, ctx.
+                                   message.guild.members).avatar_url)
         delta = datetime.now() - self.bot.created_at
-        embed.set_footer(text="Created at " + self.bot.created_at.strftime(
-            "%d/%m/%Y %H:%M:%S") + " (" + utils.convert_seconds_to_str(
-                delta.total_seconds()) + " ago)")
+        embed.set_footer(
+            text="Created at " +
+            self.bot.created_at.strftime("%d/%m/%Y %H:%M:%S") + " (" +
+            utils.convert_seconds_to_str(delta.total_seconds()) + " ago)")
 
         verbose_version = str(
             subprocess.check_output("python --version", shell=True))
@@ -527,34 +523,29 @@ class Base:
         msg = utils.convert_seconds_to_str(delta.total_seconds())
         if msg != "":
             embed.add_field(name="Run time", value=msg)
-        embed.add_field(name="Servers", value=str(len(self.bot.servers)))
+        embed.add_field(name="Servers", value=str(len(self.bot.guilds)))
         channels = self.bot.get_all_channels()
         nb_text_channels = 0
         nb_voice_channels = 0
-        for channel in channels:
-            if channel.type == discord.ChannelType.text:
-                nb_text_channels += 1
-            elif channel.type == discord.ChannelType.voice:  # Why not else? In case a new type of channel
-                nb_voice_channels += 1
+        for server in self.bot.guilds:
+            nb_text_channels += len(server.text_channels)
+            nb_voice_channels += len(server.voice_channels)
         embed.add_field(name="Text channels", value=str(nb_text_channels))
         embed.add_field(name="Voice channels", value=str(nb_voice_channels))
 
-        known_members = []
-        for server in self.bot.servers:
-            for member in server.members:
-                if member.id not in known_members:
-                    known_members.append(member.id)
-        embed.add_field(name="Members", value=str(len(known_members)))
+        nb_users = 0
+        for server in self.bot.guilds:
+            nb_users += server.member_count
+        embed.add_field(name="Members", value=str(nb_users))
         embed.add_field(
             name="Development server",
             value="Join it by clicking [here](https://" +
             self.bot.dev_server_invitation_link + ")")
 
-        await self.bot.send_message(
-            destination=ctx.message.channel, embed=embed)
+        await ctx.message.channel.send(embed=embed)
 
     @commands.command()
-    async def version(self):
+    async def version(self, ctx):
         """Shows bot's version"""
         python_version = str(
             subprocess.check_output("python --version", shell=True))[2:-5]
@@ -566,44 +557,47 @@ class Base:
             os_infos += " 64 bits"
         else:
             os_infos += " 32 bits"
-        await self.bot.say(
-            "Python version: " + python_version + "\n" + "Commit: " + commit +
-            "\n" + "Bot's version: " + self.bot.version + "\n" +
-            "Discord's version: " + discord.__version__ + "\n" +
-            "Environment: " + os_infos)
+        await ctx.channel.send("Python version: " + python_version + "\n" +
+                               "Commit: " + commit + "\n" + "Bot's version: " +
+                               self.bot.version + "\n" + "Discord's version: " +
+                               discord.__version__ + "\n" + "Environment: " +
+                               os_infos)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def bug(self, ctx, *, message):
         """Reports a bug"""
         try:
             message = ctx.message.author.name + "#" + ctx.message.author.discriminator + \
-                "[" + ctx.message.author.id + "] reported a bug:\n" + message
+                "[" + str(ctx.message.author.id) + \
+                "] reported a bug:\n" + message
             messages = utils.split_message(message)
+            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
+                                       self.bot.get_all_members())
             for msg in messages:
-                await self.bot.send_message(
-                    destination=self.bot.owner, content=msg)
-            await self.bot.say(
+                await owner.send(content=msg)
+            await ctx.channel.send(
                 "Thanks for reporting this bug. I let it know to " +
-                self.bot.owner.name + "#" + self.bot.owner.discriminator + ".")
+                owner.name + "#" + owner.discriminator + ".")
         except Exception as e:
-            await self.bot.say(e)
+            await ctx.channel.send(e)
 
-    @commands.command(pass_context=True)
+    @commands.command()
     async def improvement(self, ctx, *, message):
         """Submits an improvement"""
         try:
             message = ctx.message.author.name + "#" + ctx.message.author.discriminator + \
-                "[" + ctx.message.author.id + \
+                "[" + str(ctx.message.author.id) + \
                 "] submitted an improvement:\n" + message
             messages = utils.split_message(message)
+            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
+                                       self.bot.get_all_members())
             for msg in messages:
-                await self.bot.send_message(
-                    destination=self.bot.owner, content=msg)
-            await self.bot.say(
+                await owner.send(content=msg)
+            await ctx.channel.send(
                 "Thanks for submitting this improvement. I let it know to " +
-                self.bot.owner.name + "#" + self.bot.owner.discriminator + ".")
+                owner.name + "#" + owner.discriminator + ".")
         except Exception as e:
-            await self.bot.say(e)
+            await ctx.channel.send(e)
 
 
 def setup(bot):

@@ -37,9 +37,9 @@ def ask_user():
     while answer != "3":
         clear()
 
-        answer = input(
-            "What do you want to do?\n\n" + "1. Install & update requirements\n"
-            + "2. Launch the bot\n" + "3. Quit\n\n> ")
+        answer = input("What do you want to do?\n\n" +
+                       "1. Install & update requirements\n" +
+                       "2. Launch the bot\n" + "3. Quit\n\n> ")
 
         if answer == "1":
             install_requirements()

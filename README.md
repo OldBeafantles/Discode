@@ -292,6 +292,17 @@ If you wanna merge your improvments, please ensure your code respects the google
 
 ## Changelog
 
+**19/01/2019**
+
+[**1.1.0**]
+
+- Updated the bot for the new version of discord.py.
+- Removed the logger because it was taking too much place on the disk.
+- Removed a very time-consuming operation from `info` command.
+- Fixed a bug with `bug` and `improvement` commands.
+- Fixed a bug with `code` command (compiler & runtime options weren't taken into account).
+
+
 **15/07/2018**
 
 [**1.0.3**]

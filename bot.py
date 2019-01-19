@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 import discord
 from discord.ext import commands
 import importlib
-import logging
 from modules.utils import utils
 import os
 import sys
@@ -23,7 +22,10 @@ else:
 
 
 def _prefix_callable(bot, msg):
-    return ["<@!" + bot.user.id + "> ", "<@" + bot.user.id + "> ", bot.prefix]
+    return [
+        "<@!" + str(bot.user.id) + "> ", "<@" + str(bot.user.id) + "> ",
+        bot.prefix
+    ]
 
 
 class Discode(commands.Bot):
@@ -42,7 +44,7 @@ class Discode(commands.Bot):
             )
             if description == "":
                 description = "A bot that runs code.\nIf you have any problem with Discode or if you just want to be in the development server, you can join it using this link: discord.gg/UpYc98d"
-            owner_id = input("\n\nPlease put your ID:\n> ")
+            owner_id = int(input("\n\nPlease put your ID:\n> "))
 
             json_data["token"] = token
             json_data["prefix"] = prefix
@@ -135,12 +137,13 @@ class Discode(commands.Bot):
                 to_remove.append(mod)
             else:
                 try:
-                    print("Loading " + mod + " module...")
-                    module = importlib.import_module(
-                        module_path.replace('/', '.')[:-3])
-                    importlib.reload(module)
-                    super().load_extension(module_name)
-                    self.loaded_modules.append(mod)
+                    if mod not in self.loaded_modules:
+                        print("Loading " + mod + " module...")
+                        module = importlib.import_module(
+                            module_path.replace('/', '.')[:-3])
+                        importlib.reload(module)
+                        super().load_extension(module_name)
+                        self.loaded_modules.append(mod)
                 except SyntaxError as ex:
                     print("Error in " + mod + " module:\n\n" + str(ex) + "\n\n")
                     to_remove.append(mod)
@@ -158,7 +161,7 @@ class Discode(commands.Bot):
         self.token = ""
         self.prefix = ""
         self.description = ""
-        self.owner_id = ""
+        self.owner_id = -1
         self.config_file_path = "settings/config.json"
         self.load_config()
         self.created_at = None
@@ -176,15 +179,7 @@ class Discode(commands.Bot):
         self.init_data()
         self.invite_link = ""
         self.modules = []
-        self.version = "1.0.3"
-        self.logger = logging.getLogger('discord')
-        self.logger.setLevel(logging.DEBUG)
-        self.handler = logging.FileHandler(
-            filename="discord.log", encoding='utf-8', mode='w')
-        self.handler.setFormatter(
-            logging.Formatter(
-                "%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-        self.logger.addHandler(self.handler)
+        self.version = "1.1.0"
         self.launched_at = datetime.now()
         super().__init__(
             command_prefix=_prefix_callable,
@@ -210,21 +205,19 @@ def run_bot():
     async def on_ready():
         """Triggers when the bot just logged in"""
 
-        bot.owner = discord.utils.find(lambda m: m.id == bot.owner_id,
-                                       bot.get_all_members())
         print("Logged in as " + bot.user.name + "#" + bot.user.discriminator)
-        print(str(len(bot.servers)) + " servers")
+        print(str(len(bot.guilds)) + " servers")
         print(str(len(set(bot.get_all_channels()))) + " channels")
         print(str(len(set(bot.get_all_members()))) + " members")
         bot.invite_link = "https://discordapp.com/oauth2/authorize?client_id=" \
-            + bot.user.id + "&scope=bot"
+            + str(bot.user.id) + "&scope=bot"
         print("\nHere's the invitation link for your bot: " + bot.invite_link)
         bot.load_modules()
         bot.launched_at = datetime.now()
         print("\n" + str(len(bot.loaded_modules)) + " modules loaded.")
 
     @bot.event
-    async def on_command(command, ctx):
+    async def on_command(ctx):
         """Triggers AFTER a command is called"""
         bot.total_commands += 1
 
@@ -240,25 +233,16 @@ def run_bot():
                 await bot.process_commands(message)
 
     @bot.event
-    async def on_command_error(error, ctx):
-        if isinstance(error, commands.MissingRequiredArgument):
-            await bot.send_cmd_help(ctx, "Missing required argument")
-        elif isinstance(error, commands.BadArgument):
-            await bot.send_cmd_help(ctx, "Bad argument")
-        elif isinstance(error, commands.CommandNotFound):
-            pass
-        elif isinstance(error, commands.CheckFailure):
-            pass
-        else:
-            bot.logger.exception(type(error).__name__, exc_info=error)
+    async def on_command_error(ctx, error):
+        await ctx.message.channel.send(error)
 
     try:
         bot.run(bot.token, reconnect=True)
     except discord.LoginFailure:
         print(
             "Couldn't log in, your bot's token might be incorrect! If it's not, "
-            + "then check Discord's status here: https://status.discordapp.com/"
-        )
+            +
+            "then check Discord's status here: https://status.discordapp.com/")
         answer = input("Do you want to change your bot's token? (yes/no)\n> ")
         if answer.upper() == "YES":
             token = input("\n\nPlease put your new bot's token here:\n> ")

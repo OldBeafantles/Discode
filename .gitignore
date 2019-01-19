@@ -4,9 +4,6 @@ __pycache__
 # Settings (relative to each bot instances)
 settings
 
-# Log
-discord.log
-
 # Data files
 data/code/pastebin_key.txt
 data/code/users_configuration.json
