@@ -29,8 +29,10 @@ class Admin:
             utils.save_json(self.bot.blacklist, self.bot.blacklist_file_path)
             await ctx.channel.send("Done.")
         else:
-            await ctx.channel.send(user.name + "#" + user.discriminator + " (" +
-                                   str(user.id) + ") is already blacklisted.")
+            await ctx.channel.send(
+                user.name + "#" + user.discriminator + " (" +
+                str(user.id) + ") is already blacklisted."
+            )
 
     @commands.command()
     @checks.is_owner()
@@ -67,7 +69,8 @@ class Admin:
     async def remove_blacklist_id(self, ctx, user_id: int):
         """Removes an user from the bot's blacklist using his ID
         Parameters:
-            user_id: The ID of the user you want to to remove from the bot's blacklist.
+            user_id: The ID of the user you want to to remove from the bot's
+            blacklist.
 
         Example: [p]rem_blacklist @AGoodGuyUnfairlyBlacklisted"""
         if user_id in self.bot.blacklist:
@@ -82,7 +85,10 @@ class Admin:
     async def list_blacklist(self, ctx):
         """Lists all the blacklisted users"""
         if self.bot.blacklist:
-            msg = "```Markdown\nList of blacklisted users:\n=================\n\n"
+            msg = (
+                "```Markdown\nList of blacklisted users:"
+                "\n=================\n\n"
+            )
             i = 1
             has_unknown = False
             for user_id in self.bot.blacklist:
@@ -99,8 +105,10 @@ class Admin:
                 i += 1
             msg += "```"
             if has_unknown:
-                msg += "\n`UNKNOWN USER` means that this user hasn't any server in " + \
-                    "common with the bot."
+                msg += (
+                    "\n`UNKNOWN USER` means that this user hasn't any "
+                    "server in common with the bot."
+                )
             await ctx.channel.send(msg)
         else:
             await ctx.channel.send("There is no blacklisted users.")

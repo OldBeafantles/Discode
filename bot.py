@@ -32,7 +32,8 @@ class Discode(commands.Bot):
     """The bot class"""
 
     def load_config(self):
-        """Loads self.config_file_path, gets the infos if the file doesn't exists"""
+        """Loads self.config_file_path, gets the infos if the file
+        doesn't exists"""
         if not os.path.exists(self.config_file_path):
 
             json_data = {}
@@ -40,10 +41,16 @@ class Discode(commands.Bot):
             print("DO NOT SPREAD YOUR bot'S TOKEN TO ANYONE. NEVER.\n")
             prefix = input("\n\nPlease put your bot's prefix here:\n> ")
             description = input(
-                "\n\nPlease put a little description for your bot (optionnal)\n> "
+                "\n\nPlease put a little description "
+                "for your bot (optionnal)\n> "
             )
             if description == "":
-                description = "A bot that runs code.\nIf you have any problem with Discode or if you just want to be in the development server, you can join it using this link: discord.gg/UpYc98d"
+                description = (
+                    "A bot that runs code.\nIf you have any "
+                    "problem with Discode or if you just want "
+                    "to be in the development server, you can "
+                    "join it using this link: discord.gg/UpYc98d"
+                )
             owner_id = int(input("\n\nPlease put your ID:\n> "))
 
             json_data["token"] = token
@@ -62,11 +69,14 @@ class Discode(commands.Bot):
 
         else:
             json_data = utils.load_json(self.config_file_path)
-            if not "token" in json_data or not "prefix" in json_data \
-                    or not "description" in json_data or not "owner id" in json_data:
+            if "token" not in json_data or "prefix" not in json_data \
+                    or "description" not in json_data \
+                    or "owner id" not in json_data:
                 print(
-                    "\"settings/config.json\" is incorrect! The bot will be reseted, "
-                    + "please restart the bot!")
+                    "\"settings/config.json\" is incorrect! "
+                    "The bot will be reseted, "
+                    "please restart the bot!"
+                )
                 os.remove(self.config_file_path)
                 sys.exit(1)
             else:
@@ -97,10 +107,12 @@ class Discode(commands.Bot):
             self.reset_infos()
         else:
             json_data = utils.load_json(self.info_file_path)
-            if not "created at" in json_data or not "total commands" in json_data \
-                    or not "total runtime" in json_data:
-                print("\"settings/infos.json\" is incorrect! The info of " +
-                      "the bot will be reseted!")
+            if "created at" not in json_data or "total commands" \
+                    not in json_data or "total runtime" not in json_data:
+                print(
+                    "\"settings/infos.json\" is incorrect! The info of "
+                    "the bot will be reseted!"
+                )
                 self.reset_infos()
             else:
                 self.created_at = datetime.strptime(json_data["created at"],
@@ -145,7 +157,9 @@ class Discode(commands.Bot):
                         super().load_extension(module_name)
                         self.loaded_modules.append(mod)
                 except SyntaxError as ex:
-                    print("Error in " + mod + " module:\n\n" + str(ex) + "\n\n")
+                    print(
+                        "Error in " + mod + " module:\n\n" + str(ex) + "\n\n"
+                    )
                     to_remove.append(mod)
         for mod in to_remove:
             self.modules.remove(mod)
@@ -209,7 +223,7 @@ def run_bot():
         print(str(len(bot.guilds)) + " servers")
         print(str(len(set(bot.get_all_channels()))) + " channels")
         print(str(len(set(bot.get_all_members()))) + " members")
-        bot.invite_link = "https://discordapp.com/oauth2/authorize?client_id=" \
+        bot.invite_link = "https://discordapp.com/oauth2/authorize?client_id="\
             + str(bot.user.id) + "&scope=bot"
         print("\nHere's the invitation link for your bot: " + bot.invite_link)
         bot.load_modules()
@@ -240,9 +254,10 @@ def run_bot():
         bot.run(bot.token, reconnect=True)
     except discord.LoginFailure:
         print(
-            "Couldn't log in, your bot's token might be incorrect! If it's not, "
-            +
-            "then check Discord's status here: https://status.discordapp.com/")
+            "Couldn't log in, your bot's token might be incorrect! "
+            "If it's not, then check Discord's status here: "
+            "https://status.discordapp.com/"
+        )
         answer = input("Do you want to change your bot's token? (yes/no)\n> ")
         if answer.upper() == "YES":
             token = input("\n\nPlease put your new bot's token here:\n> ")
