@@ -1,12 +1,9 @@
 """Owner module"""
 
 import discord
-import sys
-import os
 import traceback
 from discord.ext import commands
 from modules.utils import checks
-from modules.utils import utils
 import textwrap
 import inspect
 import asyncio
@@ -15,7 +12,7 @@ from contextlib import redirect_stdout
 import requests
 from os import listdir
 import subprocess
-from datetime import datetime, timedelta
+from datetime import datetime
 import platform
 from modules.utils import utils
 
