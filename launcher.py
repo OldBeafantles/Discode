@@ -3,7 +3,6 @@
 import os
 import subprocess
 import sys
-import shutil
 
 # USEFUL FUNCTIONS
 if sys.platform == "win32" or sys.platform == "win64":
