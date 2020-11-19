@@ -1,8 +1,4 @@
 """Admin module"""
-import os
-import math
-from datetime import datetime
-import copy
 import discord
 from discord.ext import commands
 from modules.utils import checks
