@@ -56,9 +56,7 @@ class Code(commands.Cog):
         self.default_engines = utils.load_json(self.default_engines_file_path)
 
         # Languages logos
-        self.languages_images = utils.load_json(
-            self.languages_images_file_path
-        )
+        self.languages_images = utils.load_json(self.languages_images_file_path)
 
         # Languages files extensions
         # https://fileinfo.com/filetypes/developer
@@ -146,8 +144,7 @@ class Code(commands.Cog):
                 # We delete redundant info
                 # ------------------------
                 del self.configuration[language][template][name]["name"]
-                del self.configuration[language][template][name][
-                    "display-name"]
+                del self.configuration[language][template][name]["display-name"]
                 del self.configuration[language][template][name]["language"]
                 del self.configuration[language][template][name]["templates"]
                 # I don't know what "provider" means but as this attribute
@@ -201,16 +198,14 @@ class Code(commands.Cog):
                                                  result[parameter_name])
                 delimiter = url.rfind("/")
                 url = url[:delimiter] + "/raw" + url[delimiter:]
-                embed.add_field(
-                    name=field_name,
-                    value=":page_facing_up: [" + field_name + ".txt](" + url +
-                    ")",
-                    inline=False)
+                embed.add_field(name=field_name,
+                                value=":page_facing_up: [" + field_name +
+                                ".txt](" + url + ")",
+                                inline=False)
             else:
-                embed.add_field(
-                    name=field_name,
-                    value="`" + result[parameter_name] + "`",
-                    inline=False)
+                embed.add_field(name=field_name,
+                                value="`" + result[parameter_name] + "`",
+                                inline=False)
 
     async def create_embed_result(self, ctx, language: str, template_used: str,
                                   engine_used: str, command_options: str,
@@ -226,11 +221,11 @@ class Code(commands.Cog):
         timestamp += -1 * get_localzone().utcoffset(timestamp)
         embed.timestamp = timestamp
         embed.add_field(name="Engine used", value=engine_used, inline=True)
-        embed.add_field(
-            name="Command used",
-            value=self.configuration[language][template_used][engine_used]
-            ["display-compile-command"] + " " + command_options,
-            inline=True)
+        embed.add_field(name="Command used",
+                        value=self.configuration[language][template_used]
+                        [engine_used]["display-compile-command"] + " " +
+                        command_options,
+                        inline=True)
         if "compiler_error" in info or "program_error" in info:
             if "status" not in info or info["status"] != '0':
                 embed.colour = discord.Color.red()
@@ -242,21 +237,21 @@ class Code(commands.Cog):
             embed.colour = discord.Color.orange()
         else:
             embed.colour = discord.Color.green()
-        embed.set_footer(
-            text="Requested by " + ctx.message.author.name + "#" +
-            ctx.message.author.discriminator,
-            icon_url=ctx.message.author.avatar_url)
+        embed.set_footer(text="Requested by " + ctx.message.author.name + "#" +
+                         ctx.message.author.discriminator,
+                         icon_url=ctx.message.author.avatar_url)
         embed.set_thumbnail(url=self.languages_images[language])
-        embed.set_author(
-            name=self.bot.user.name + "#" + self.bot.user.discriminator,
-            icon_url=self.bot.user.avatar_url)
+        embed.set_author(name=self.bot.user.name + "#" +
+                         self.bot.user.discriminator,
+                         icon_url=self.bot.user.avatar_url)
 
         remaining_space = 6000 - \
             (30 + len(ctx.message.author.name) + len(self.bot.user.name))
 
         if "status" in info:
-            embed.add_field(
-                name="Exit status", value=info["status"], inline=False)
+            embed.add_field(name="Exit status",
+                            value=info["status"],
+                            inline=False)
             remaining_space -= 11 + len(info["status"])
 
         await self.add_long_field(embed, "signal", info, "Signal")
@@ -344,8 +339,7 @@ class Code(commands.Cog):
             if no_code:
                 await ctx.channel.send(
                     "Incorrect syntax, please use Markdown's "
-                    "syntax for your code."
-                )
+                    "syntax for your code.")
                 return
             for language in self.languages_identifiers:
                 if language_extension in self.languages_identifiers[language]:
@@ -355,8 +349,7 @@ class Code(commands.Cog):
                 await ctx.channel.send(
                     "Incorrect language identifier for your code.\n"
                     "To list all the supported languages identifiers, "
-                    "please use `" + self.bot.prefix + "list_identifiers`."
-                )
+                    "please use `" + self.bot.prefix + "list_identifiers`.")
             before = code[:begin]
             after = code[end + begin + 6 + len(language_extension):]
             lines = ((before[:-1] if before else "") +
@@ -387,9 +380,8 @@ class Code(commands.Cog):
                     if begin == -1:
                         await ctx.channel.send(
                             "Invalid input parameter format.\nCheck "
-                            "out input format by typing `" + self.bot.prefix
-                            + "help code`."
-                        )
+                            "out input format by typing `" + self.bot.prefix +
+                            "help code`.")
                         return
                     parameter_value = ""
                     line = line[begin + 1:]
@@ -408,9 +400,8 @@ class Code(commands.Cog):
                     if not found:
                         await ctx.channel.send(
                             "Invalid input parameter format.\nCheck out "
-                            "input format by typing `"
-                            + self.bot.prefix + "help code`."
-                        )
+                            "input format by typing `" + self.bot.prefix +
+                            "help code`.")
                         return
                 elif parameter_name == "output_only":
                     parameter_value = True
@@ -419,9 +410,8 @@ class Code(commands.Cog):
                     if begin == -1:
                         await ctx.channel.send(
                             "Invalid code parameter format.\n"
-                            "Check out code format by typing `"
-                            + self.bot.prefix + "help code`."
-                        )
+                            "Check out code format by typing `" +
+                            self.bot.prefix + "help code`.")
                         return
                     parameter_value = []
                     line = line[begin + 1:]
@@ -440,9 +430,8 @@ class Code(commands.Cog):
                     if not found:
                         await ctx.channel.send(
                             "Invalid code parameter format.\nCheck out "
-                            "code format by typing `"
-                            + self.bot.prefix + "help code`."
-                        )
+                            "code format by typing `" + self.bot.prefix +
+                            "help code`.")
                         return
                     new_value = []
                     supposed_languages = {}
@@ -453,8 +442,7 @@ class Code(commands.Cog):
                             if not line.startswith("https://pastebin.com/"):
                                 await ctx.channel.send(
                                     "Incorrect link for the first file.\n"
-                                    "The link must be an url from pastebin."
-                                )
+                                    "The link must be an url from pastebin.")
                                 return
                             else:
                                 url = line
@@ -468,9 +456,8 @@ class Code(commands.Cog):
                         if delimiter == -1:
                             await ctx.channel.send(
                                 "Invalid code parameter format.\nCheck "
-                                "out code format by typing `"
-                                + self.bot.prefix + "help code`."
-                            )
+                                "out code format by typing `" +
+                                self.bot.prefix + "help code`.")
                             return
                         file_name = line[:delimiter]
                         file_link = line[delimiter + 1:]
@@ -494,12 +481,10 @@ class Code(commands.Cog):
                                 await ctx.channel.send(
                                     "Invalid file name format.\nThere is "
                                     "no file extension.\nCheck out code "
-                                    "format by typing `"
-                                    + self.bot.prefix + "help code`."
-                                )
+                                    "format by typing `" + self.bot.prefix +
+                                    "help code`.")
                                 return
-                            file_extension = file_name[
-                                extension_delimiter + 1:]
+                            file_extension = file_name[extension_delimiter + 1:]
                             for language in self.languages_files_extensions:
                                 if file_extension.lower(
                                 ) in self.languages_files_extensions[language]:
@@ -507,15 +492,11 @@ class Code(commands.Cog):
                                         supposed_languages[language] += 1
                                     else:
                                         supposed_languages[language] = 1
-                        new_value.append({
-                            "file": file_name,
-                            "code": file_code
-                        })
+                        new_value.append({"file": file_name, "code": file_code})
                     if supposed_languages:
-                        supposed_language = sorted(
-                            supposed_languages.items(),
-                            key=lambda x: x[1],
-                            reverse=True)[0][0]
+                        supposed_language = sorted(supposed_languages.items(),
+                                                   key=lambda x: x[1],
+                                                   reverse=True)[0][0]
                     parameter_value = first_code
                     parameters["codes"] = new_value
                 elif parameter_name == "language":
@@ -523,9 +504,8 @@ class Code(commands.Cog):
                     if delimiter == -1:
                         await ctx.channel.send(
                             "Please specify a code language.\nCheck out "
-                            "code format by typing `"
-                            + self.bot.prefix + "help code`."
-                        )
+                            "code format by typing `" + self.bot.prefix +
+                            "help code`.")
                         return
                     language_name = line[delimiter + 1:]
                     correct_language = False
@@ -539,9 +519,8 @@ class Code(commands.Cog):
                             "`" + language_name +
                             "` is not a correct language name / "
                             "isn't available for the bot.\nTo "
-                            "list all the available languages, please use `"
-                            + self.bot.prefix + "list_languages`."
-                        )
+                            "list all the available languages, please use `" +
+                            self.bot.prefix + "list_languages`.")
                         return
                     parameter_value = code_language
                 else:
@@ -559,9 +538,8 @@ class Code(commands.Cog):
             if not supposed_language:
                 await ctx.channel.send(
                     "Couldn't guess which language to use.\nPlease specify "
-                    "it with `language` parameter.\nCheck out `"
-                    + self.bot.prefix + "help code` for more info."
-                )
+                    "it with `language` parameter.\nCheck out `" +
+                    self.bot.prefix + "help code` for more info.")
                 return
             else:
                 code_language = supposed_language
@@ -569,9 +547,8 @@ class Code(commands.Cog):
                     code_language +
                     " was supposed according to your files names.\nTo "
                     "specify it explicity, please use `language` "
-                    "parameter.\nCheck out `"
-                    + self.bot.prefix + "help code` for more info."
-                )
+                    "parameter.\nCheck out `" + self.bot.prefix +
+                    "help code` for more info.")
         engine_template_used = None
         if "engine" in parameters:
             correct_engine = False
@@ -603,13 +580,14 @@ class Code(commands.Cog):
                     if correct_engine:
                         break
             if not correct_engine:
-                await ctx.channel.send(
-                    "`" + parameters["engine"] +
-                    "` is not a correct engine for " + code_language +
-                    " / isn't available for the bot.\nTo "
-                    "list all the available engine for "
-                    + code_language + ", please use `" + self.bot.prefix +
-                    "list_engines " + code_language + "`")
+                await ctx.channel.send("`" + parameters["engine"] +
+                                       "` is not a correct engine for " +
+                                       code_language +
+                                       " / isn't available for the bot.\nTo "
+                                       "list all the available engine for " +
+                                       code_language + ", please use `" +
+                                       self.bot.prefix + "list_engines " +
+                                       code_language + "`")
                 return
         else:
             if ctx.message.author.id in self.users_configuration \
@@ -678,8 +656,8 @@ class Code(commands.Cog):
         }
 
         async with ctx.typing():
-            result = await self.post_fetch("https://wandbox.org/api/compile.json",
-                                            request)
+            result = await self.post_fetch(
+                "https://wandbox.org/api/compile.json", request)
 
         if not parameters["output_only"] or "compiler_error" in result \
                 or "program_error" in result:
@@ -733,9 +711,8 @@ class Code(commands.Cog):
                 return
         await ctx.channel.send(
             "There is no such available language.\nTo list all the "
-            "available languages, please use `"
-            + self.bot.prefix + "list_languages`."
-        )
+            "available languages, please use `" + self.bot.prefix +
+            "list_languages`.")
 
     @commands.command()
     async def list_identifiers(self, ctx):
@@ -751,10 +728,8 @@ class Code(commands.Cog):
     @commands.command()
     async def list_extensions(self, ctx):
         """Lists all the languages files extensions recognized by the bot"""
-        msg = (
-            "```Markdown\nLanguages files extensions"
-            "\n=====================\n\n"
-        )
+        msg = ("```Markdown\nLanguages files extensions"
+               "\n=====================\n\n")
         for language in self.languages_files_extensions:
             msg += "- " + language + (" " * (18 - len(language))) + "--> ." + \
                 " / .".join(self.languages_files_extensions[language]) + "\n"
@@ -776,10 +751,7 @@ class Code(commands.Cog):
         if user.id not in self.users_configuration:
             self.users_configuration[user.id] = {}
         self.users_configuration[user.id][attribute] = value
-        utils.save_json(
-            self.users_configuration,
-            self.users_configuration_path
-        )
+        utils.save_json(self.users_configuration, self.users_configuration_path)
 
     def set_user_sub_config(self, user: discord.Member, sub_config_name: str,
                             attribute: str, value):
@@ -788,10 +760,7 @@ class Code(commands.Cog):
         if sub_config_name not in self.users_configuration[user.id]:
             self.users_configuration[user.id][sub_config_name] = {}
         self.users_configuration[user.id][sub_config_name][attribute] = value
-        utils.save_json(
-            self.users_configuration,
-            self.users_configuration_path
-        )
+        utils.save_json(self.users_configuration, self.users_configuration_path)
 
     @commands.group()
     async def config(self, ctx):
@@ -807,10 +776,8 @@ class Code(commands.Cog):
             EVERYTHING to show all info
         """
         if output_mode not in ["OUTPUT_ONLY", "EVERYTHING"]:
-            await ctx.channel.send(
-                "Please choose one of the following option: "
-                "EVERYTHING / OUTPUT_ONLY."
-            )
+            await ctx.channel.send("Please choose one of the following option: "
+                                   "EVERYTHING / OUTPUT_ONLY.")
         else:
             self.set_user_config(
                 ctx.message.author, "output_only",
@@ -829,10 +796,7 @@ class Code(commands.Cog):
             await ctx.channel.send("You hadn't any configured settings.")
 
     @config.command()
-    async def engine(self,
-                     ctx,
-                     language_name: str = "",
-                     engine_name: str = ""):
+    async def engine(self, ctx, language_name: str = "", engine_name: str = ""):
         """Specifies default engine for a specific language"""
         if not language_name:
             await ctx.channel.send("Please specify a language.")
@@ -850,8 +814,7 @@ class Code(commands.Cog):
                 "`" + language_name +
                 "` is not a correct language name / isn't available "
                 "for the bot.\nTo list all the available languages, "
-                "please use `" + self.bot.prefix + "list_languages`."
-            )
+                "please use `" + self.bot.prefix + "list_languages`.")
             return
         engine_template_name = None
         for engine_template in self.configuration[language_name]:
@@ -865,10 +828,8 @@ class Code(commands.Cog):
                 "`" + engine_name + "` is not a correct engine for " +
                 language_name +
                 " / isn't available for the bot.\nTo list all the "
-                "available engine for " + language_name
-                + ", please use `" + self.bot.prefix +
-                "list_engines " + language_name + "`"
-            )
+                "available engine for " + language_name + ", please use `" +
+                self.bot.prefix + "list_engines " + language_name + "`")
             return
         self.set_user_sub_config(ctx.message.author, "engines", language_name,
                                  [engine_template_name, engine_name])
@@ -895,8 +856,7 @@ class Code(commands.Cog):
                 "`" + language_name +
                 "` is not a correct language name / isn't available "
                 "for the bot.\nTo list all the available languages, "
-                "please use `" + self.bot.prefix + "list_languages`."
-            )
+                "please use `" + self.bot.prefix + "list_languages`.")
             return
         self.set_user_sub_config(ctx.message.author, "compiler_options",
                                  language_name, compiler_options)
@@ -921,8 +881,8 @@ class Code(commands.Cog):
             await ctx.channel.send(
                 "`" + language_name +
                 "` is not a correct language name / isn't available for "
-                "the bot.\nTo list all the available languages, please use `"
-                + self.bot.prefix + "list_languages`.")
+                "the bot.\nTo list all the available languages, please use `" +
+                self.bot.prefix + "list_languages`.")
             return
         self.set_user_sub_config(ctx.message.author, "runtime_options",
                                  language_name, runtime_options)

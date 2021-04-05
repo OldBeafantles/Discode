@@ -17,11 +17,10 @@ else:
 
 def check_updates():
     """Checks if there are some available updates for the bot"""
-    subprocess.call(
-        "git fetch",
-        stdout=open(os.devnull, 'w'),
-        stderr=subprocess.STDOUT,
-        shell=True)
+    subprocess.call("git fetch",
+                    stdout=open(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT,
+                    shell=True)
     result = subprocess.check_output("git status", shell=True)
     if "Your branch is behind" in str(result):
         answer = input(
@@ -49,11 +48,10 @@ def ask_user():
 
 def install_requirements():
     """Installs requirements"""
-    subprocess.call(
-        "python -m pip install -U -r requirements.txt",
-        stdout=open(os.devnull, 'w'),
-        stderr=subprocess.STDOUT,
-        shell=True)
+    subprocess.call("python -m pip install -U -r requirements.txt",
+                    stdout=open(os.devnull, 'w'),
+                    stderr=subprocess.STDOUT,
+                    shell=True)
 
 
 if __name__ == "__main__":

@@ -25,10 +25,8 @@ class Admin(commands.Cog):
             utils.save_json(self.bot.blacklist, self.bot.blacklist_file_path)
             await ctx.channel.send("Done.")
         else:
-            await ctx.channel.send(
-                user.name + "#" + user.discriminator + " (" +
-                str(user.id) + ") is already blacklisted."
-            )
+            await ctx.channel.send(user.name + "#" + user.discriminator + " (" +
+                                   str(user.id) + ") is already blacklisted.")
 
     @commands.command()
     @checks.is_owner()
@@ -81,15 +79,12 @@ class Admin(commands.Cog):
     async def list_blacklist(self, ctx):
         """Lists all the blacklisted users"""
         if self.bot.blacklist:
-            msg = (
-                "```Markdown\nList of blacklisted users:"
-                "\n=================\n\n"
-            )
+            msg = ("```Markdown\nList of blacklisted users:"
+                   "\n=================\n\n")
             has_unknown = False
             for i, user_id in enumerate(self.bot.blacklist):
-                user = discord.utils.find(
-                    lambda u, u_id=user_id: u.id == u_id,
-                    self.bot.get_all_members())
+                user = discord.utils.find(lambda u, u_id=user_id: u.id == u_id,
+                                          self.bot.get_all_members())
                 msg += f"{i+1}. "
                 if user:
                     msg += f"{user} ({user.id})\n"
@@ -98,10 +93,8 @@ class Admin(commands.Cog):
                     msg += f"UNKNOWN USER ({user_id})\n"
             msg += "```"
             if has_unknown:
-                msg += (
-                    "\n`UNKNOWN USER` means that this user hasn't any "
-                    "server in common with the bot."
-                )
+                msg += ("\n`UNKNOWN USER` means that this user hasn't any "
+                        "server in common with the bot.")
             await ctx.channel.send(msg)
         else:
             await ctx.channel.send("There is no blacklisted users.")
