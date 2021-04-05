@@ -676,8 +676,10 @@ class Code(commands.Cog):
             "compiler-option-raw": parameters["compiler-options"],
             "runtime-option-raw": parameters["runtime-options"]
         }
-        result = await self.post_fetch("https://wandbox.org/api/compile.json",
-                                       request)
+
+        async with ctx.typing():
+            result = await self.post_fetch("https://wandbox.org/api/compile.json",
+                                            request)
 
         if not parameters["output_only"] or "compiler_error" in result \
                 or "program_error" in result:
