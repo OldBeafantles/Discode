@@ -588,8 +588,7 @@ class Base(commands.Cog):
                 "[" + str(ctx.message.author.id) + \
                 "] reported a bug:\n" + message
             messages = utils.split_message(message)
-            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
-                                       self.bot.get_all_members())
+            owner = await self.bot.fetch_user(self.bot.config_owner_id)
             for msg in messages:
                 await owner.send(content=msg)
             await ctx.channel.send(
@@ -607,8 +606,7 @@ class Base(commands.Cog):
                 "[" + str(ctx.message.author.id) + \
                 "] submitted an improvement:\n" + message
             messages = utils.split_message(message)
-            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
-                                       self.bot.get_all_members())
+            owner = await self.bot.fetch_user(self.bot.config_owner_id)
             for msg in messages:
                 await owner.send(content=msg)
             await ctx.channel.send(

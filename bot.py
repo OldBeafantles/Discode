@@ -60,7 +60,7 @@ class Discode(commands.Bot):
             self.token = token
             self.prefix = prefix
             self.description = description
-            self.owner_id = owner_id
+            self.config_owner_id = owner_id
 
             if not os.path.isdir("settings"):
                 os.makedirs("settings")
@@ -83,7 +83,7 @@ class Discode(commands.Bot):
                 self.token = json_data["token"]
                 self.prefix = json_data["prefix"]
                 self.description = json_data["description"]
-                self.owner_id = json_data["owner id"]
+                self.config_owner_id = json_data["owner id"]
 
     def reset_infos(self):
         """Resets bot's info"""
@@ -175,7 +175,7 @@ class Discode(commands.Bot):
         self.token = ""
         self.prefix = ""
         self.description = ""
-        self.owner_id = -1
+        self.config_owner_id = -1
         self.config_file_path = "settings/config.json"
         self.load_config()
         self.created_at = None
