@@ -17,7 +17,7 @@ from os import listdir
 from contextlib import redirect_stdout
 
 
-class Base:
+class Base(commands.Cog):
     """Basic commands"""
 
     def __init__(self, bot):
@@ -26,7 +26,7 @@ class Base:
         self.sessions = set()
         self.infos_updater = self.bot.loop.create_task(self.update_infos())
 
-    def __unload(self):
+    def cog_unload(self):
         self.infos_updater.cancel()
 
     def cleanup_code(self, content):

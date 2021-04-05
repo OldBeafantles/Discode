@@ -5,7 +5,7 @@ from modules.utils import checks
 from modules.utils import utils
 
 
-class Admin:
+class Admin(commands.Cog):
     """Admin module"""
 
     def __init__(self, bot):

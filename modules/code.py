@@ -10,7 +10,7 @@ import os
 from tzlocal import get_localzone
 
 
-class Code:
+class Code(commands.Cog):
     """Code module"""
 
     async def send_cmd_help(self, ctx, message: str = ""):
