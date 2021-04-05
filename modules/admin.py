@@ -85,20 +85,17 @@ class Admin(commands.Cog):
                 "```Markdown\nList of blacklisted users:"
                 "\n=================\n\n"
             )
-            i = 1
             has_unknown = False
-            for user_id in self.bot.blacklist:
+            for i, user_id in enumerate(self.bot.blacklist):
                 user = discord.utils.find(
                     lambda u, u_id=user_id: u.id == u_id,
                     self.bot.get_all_members())
-                msg += str(i) + ". "
+                msg += f"{i+1}. "
                 if user:
-                    msg += user.name + "#" + \
-                        user.discriminator + " (" + str(user.id) + ")\n"
+                    msg += f"{user} ({user.id})\n"
                 else:
                     has_unknown = True
-                    msg += "UNKNOWN USER\n"
-                i += 1
+                    msg += f"UNKNOWN USER ({user_id})\n"
             msg += "```"
             if has_unknown:
                 msg += (
