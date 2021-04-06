@@ -19,12 +19,11 @@ def load_json(filename: str):
 def save_json(data: json, filename: str, should_be_sorted=True):
     """Saves a json file"""
     with open(filename, encoding="utf-8", mode="w") as file:
-        json.dump(
-            data,
-            file,
-            indent=4,
-            sort_keys=should_be_sorted,
-            separators=(',', ': '))
+        json.dump(data,
+                  file,
+                  indent=4,
+                  sort_keys=should_be_sorted,
+                  separators=(',', ': '))
 
 
 def convert_seconds_to_str(sec: float):

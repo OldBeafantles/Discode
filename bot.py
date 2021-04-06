@@ -40,17 +40,13 @@ class Discode(commands.Bot):
             token = input("Please put your bot's token here:\n> ")
             print("DO NOT SPREAD YOUR bot'S TOKEN TO ANYONE. NEVER.\n")
             prefix = input("\n\nPlease put your bot's prefix here:\n> ")
-            description = input(
-                "\n\nPlease put a little description "
-                "for your bot (optionnal)\n> "
-            )
+            description = input("\n\nPlease put a little description "
+                                "for your bot (optionnal)\n> ")
             if description == "":
-                description = (
-                    "A bot that runs code.\nIf you have any "
-                    "problem with Discode or if you just want "
-                    "to be in the development server, you can "
-                    "join it using this link: discord.gg/UpYc98d"
-                )
+                description = ("A bot that runs code.\nIf you have any "
+                               "problem with Discode or if you just want "
+                               "to be in the development server, you can "
+                               "join it using this link: discord.gg/UpYc98d")
             owner_id = int(input("\n\nPlease put your ID:\n> "))
 
             json_data["token"] = token
@@ -60,7 +56,7 @@ class Discode(commands.Bot):
             self.token = token
             self.prefix = prefix
             self.description = description
-            self.owner_id = owner_id
+            self.config_owner_id = owner_id
 
             if not os.path.isdir("settings"):
                 os.makedirs("settings")
@@ -72,18 +68,16 @@ class Discode(commands.Bot):
             if "token" not in json_data or "prefix" not in json_data \
                     or "description" not in json_data \
                     or "owner id" not in json_data:
-                print(
-                    "\"settings/config.json\" is incorrect! "
-                    "The bot will be reseted, "
-                    "please restart the bot!"
-                )
+                print("\"settings/config.json\" is incorrect! "
+                      "The bot will be reseted, "
+                      "please restart the bot!")
                 os.remove(self.config_file_path)
                 sys.exit(1)
             else:
                 self.token = json_data["token"]
                 self.prefix = json_data["prefix"]
                 self.description = json_data["description"]
-                self.owner_id = json_data["owner id"]
+                self.config_owner_id = json_data["owner id"]
 
     def reset_infos(self):
         """Resets bot's info"""
@@ -109,10 +103,8 @@ class Discode(commands.Bot):
             json_data = utils.load_json(self.info_file_path)
             if "created at" not in json_data or "total commands" \
                     not in json_data or "total runtime" not in json_data:
-                print(
-                    "\"settings/infos.json\" is incorrect! The info of "
-                    "the bot will be reseted!"
-                )
+                print("\"settings/infos.json\" is incorrect! The info of "
+                      "the bot will be reseted!")
                 self.reset_infos()
             else:
                 self.created_at = datetime.strptime(json_data["created at"],
@@ -157,9 +149,7 @@ class Discode(commands.Bot):
                         super().load_extension(module_name)
                         self.loaded_modules.append(mod)
                 except SyntaxError as ex:
-                    print(
-                        "Error in " + mod + " module:\n\n" + str(ex) + "\n\n"
-                    )
+                    print("Error in " + mod + " module:\n\n" + str(ex) + "\n\n")
                     to_remove.append(mod)
         for mod in to_remove:
             self.modules.remove(mod)
@@ -175,7 +165,7 @@ class Discode(commands.Bot):
         self.token = ""
         self.prefix = ""
         self.description = ""
-        self.owner_id = -1
+        self.config_owner_id = -1
         self.config_file_path = "settings/config.json"
         self.load_config()
         self.created_at = None
@@ -195,10 +185,9 @@ class Discode(commands.Bot):
         self.modules = []
         self.version = "1.1.0"
         self.launched_at = datetime.now()
-        super().__init__(
-            command_prefix=_prefix_callable,
-            description=self.description,
-            loop=loop)
+        super().__init__(command_prefix=_prefix_callable,
+                         description=self.description,
+                         loop=loop)
         self.session = aiohttp.ClientSession(loop=loop)
         self.dev_server_invitation_link = "discord.gg/UpYc98d"
         clear()
@@ -253,11 +242,9 @@ def run_bot():
     try:
         bot.run(bot.token, reconnect=True)
     except discord.LoginFailure:
-        print(
-            "Couldn't log in, your bot's token might be incorrect! "
-            "If it's not, then check Discord's status here: "
-            "https://status.discordapp.com/"
-        )
+        print("Couldn't log in, your bot's token might be incorrect! "
+              "If it's not, then check Discord's status here: "
+              "https://status.discordapp.com/")
         answer = input("Do you want to change your bot's token? (yes/no)\n> ")
         if answer.upper() == "YES":
             token = input("\n\nPlease put your new bot's token here:\n> ")

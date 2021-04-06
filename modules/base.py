@@ -17,7 +17,7 @@ from os import listdir
 from contextlib import redirect_stdout
 
 
-class Base:
+class Base(commands.Cog):
     """Basic commands"""
 
     def __init__(self, bot):
@@ -26,7 +26,7 @@ class Base:
         self.sessions = set()
         self.infos_updater = self.bot.loop.create_task(self.update_infos())
 
-    def __unload(self):
+    def cog_unload(self):
         self.infos_updater.cancel()
 
     def cleanup_code(self, content):
@@ -63,8 +63,7 @@ class Base:
         """Gets invitation link"""
         await ctx.channel.send(
             "If you want to invite the bot to your server, "
-            f"you can use this link: <{self.bot.invite_link}>"
-        )
+            f"you can use this link: <{self.bot.invite_link}>")
 
     @commands.command(name='eval')
     @checks.is_owner()
@@ -133,8 +132,7 @@ class Base:
         if ctx.message.channel.id in self.sessions:
             await ctx.channel.send(
                 'Already running a REPL session in this channel. '
-                'Exit it with `quit`.'
-            )
+                'Exit it with `quit`.')
             return
 
         self.sessions.add(ctx.message.channel.id)
@@ -148,8 +146,9 @@ class Base:
 
         while True:
             try:
-                response = await self.bot.wait_for(
-                    'message', check=check, timeout=10.0 * 60.0)
+                response = await self.bot.wait_for('message',
+                                                   check=check,
+                                                   timeout=10.0 * 60.0)
             except asyncio.TimeoutError:
                 await ctx.channel.send('Exiting REPL session.')
                 self.sessions.remove(ctx.message.channel.id)
@@ -203,9 +202,7 @@ class Base:
             try:
                 if fmt is not None:
                     if len(fmt) > 2000:
-                        await ctx.channel.send(
-                            'Content too big to be printed.'
-                        )
+                        await ctx.channel.send('Content too big to be printed.')
                     else:
                         await ctx.channel.send(fmt)
             except discord.Forbidden:
@@ -262,9 +259,7 @@ class Base:
 
             self.bot.load_extension("modules." + module)
             self.bot.loaded_modules.append(module)
-            utils.save_json(
-                self.bot.loaded_modules, self.bot.modules_file_path
-            )
+            utils.save_json(self.bot.loaded_modules, self.bot.modules_file_path)
         except Exception:
             tb = traceback.format_exc()
             await ctx.channel.send("\U0001f52b\n```" + tb + "```")
@@ -318,8 +313,7 @@ class Base:
             await ctx.channel.send(
                 "Error " + str(r.status_code) +
                 ": The link must be incorrect, " +
-                "make sure the link finishes with `.png`, `.jpg`, `.jpeg`, etc"
-            )
+                "make sure the link finishes with `.png`, `.jpg`, `.jpeg`, etc")
 
     @commands.command()
     @checks.is_owner()
@@ -388,9 +382,8 @@ class Base:
         try:
             if stream_link != "":
                 if stream_link.startswith("https://www.twitch.tv/"):
-                    await self.bot.change_presence(
-                        activity=discord.Streaming(
-                            name=" ".join(game), url=stream_link))
+                    await self.bot.change_presence(activity=discord.Streaming(
+                        name=" ".join(game), url=stream_link))
                     await ctx.channel.send("Done! :ok_hand:")
                 else:
                     await ctx.channel.send(
@@ -428,8 +421,7 @@ class Base:
         else:
             await ctx.channel.send(
                 "Please provide a correct status!\n" +
-                "You can check available statutes typing `[p]help set_status`."
-            )
+                "You can check available statutes typing `[p]help set_status`.")
 
     @commands.command()
     @checks.is_owner()
@@ -442,10 +434,8 @@ class Base:
             msg += "[" + str(i) + "](" + server.name + ")\n"
             i += 1
             servers.append(server.id)
-        msg += (
-            "```\nIf you want me to leave one of these servers, "
-            "just type its number."
-        )
+        msg += ("```\nIf you want me to leave one of these servers, "
+                "just type its number.")
         await ctx.channel.send(msg)
 
         def check_1(m):
@@ -465,8 +455,9 @@ class Base:
                     return msg.author == ctx.message.author \
                         and msg.channel == ctx.message.channel
 
-                answer = await self.bot.wait_for(
-                    'message', timeout=60, check=check_2)
+                answer = await self.bot.wait_for('message',
+                                                 timeout=60,
+                                                 check=check_2)
                 if answer.content.lower() == "yes":
                     try:
                         await server_to_leave.leave()
@@ -499,8 +490,8 @@ class Base:
         """Show bot's info"""
         embed = discord.Embed(title="Bot's info", type="rich embed")
         embed.set_thumbnail(
-            url=discord.utils.find(lambda x: x.id == self.bot.user.id, ctx.
-                                   message.guild.members).avatar_url)
+            url=discord.utils.find(lambda x: x.id == self.bot.user.id,
+                                   ctx.message.guild.members).avatar_url)
         delta = datetime.now() - self.bot.created_at
         embed.set_footer(
             text="Created at " +
@@ -525,10 +516,8 @@ class Base:
         embed.add_field(name="Discord's version", value=discord.__version__)
         embed.add_field(name="Environment", value=os_infos)
 
-        embed.add_field(
-            name="Total commands typed",
-            value=str(self.bot.total_commands + 1)
-        )
+        embed.add_field(name="Total commands typed",
+                        value=str(self.bot.total_commands + 1))
         delta = (datetime.now() - self.bot.launched_at) + \
             self.bot.total_runtime
         msg = utils.convert_seconds_to_str(delta.total_seconds())
@@ -551,10 +540,9 @@ class Base:
         for server in self.bot.guilds:
             nb_users += server.member_count
         embed.add_field(name="Members", value=str(nb_users))
-        embed.add_field(
-            name="Development server",
-            value="Join it by clicking [here](https://" +
-            self.bot.dev_server_invitation_link + ")")
+        embed.add_field(name="Development server",
+                        value="Join it by clicking [here](https://" +
+                        self.bot.dev_server_invitation_link + ")")
 
         await ctx.message.channel.send(embed=embed)
 
@@ -571,13 +559,11 @@ class Base:
             os_infos += " 64 bits"
         else:
             os_infos += " 32 bits"
-        await ctx.channel.send(
-            "Python version: " + python_version + "\n" +
-            "Commit: " + commit + "\n" + "Bot's version: " +
-            self.bot.version + "\n" + "Discord's version: " +
-            discord.__version__ + "\n" + "Environment: " +
-            os_infos
-        )
+        await ctx.channel.send("Python version: " + python_version + "\n" +
+                               "Commit: " + commit + "\n" + "Bot's version: " +
+                               self.bot.version + "\n" + "Discord's version: " +
+                               discord.__version__ + "\n" + "Environment: " +
+                               os_infos)
 
     @commands.command()
     async def bug(self, ctx, *, message):
@@ -588,8 +574,7 @@ class Base:
                 "[" + str(ctx.message.author.id) + \
                 "] reported a bug:\n" + message
             messages = utils.split_message(message)
-            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
-                                       self.bot.get_all_members())
+            owner = await self.bot.fetch_user(self.bot.config_owner_id)
             for msg in messages:
                 await owner.send(content=msg)
             await ctx.channel.send(
@@ -607,8 +592,7 @@ class Base:
                 "[" + str(ctx.message.author.id) + \
                 "] submitted an improvement:\n" + message
             messages = utils.split_message(message)
-            owner = discord.utils.find(lambda u: u.id == self.bot.owner_id,
-                                       self.bot.get_all_members())
+            owner = await self.bot.fetch_user(self.bot.config_owner_id)
             for msg in messages:
                 await owner.send(content=msg)
             await ctx.channel.send(
