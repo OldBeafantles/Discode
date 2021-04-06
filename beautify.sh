@@ -1,2 +1,2 @@
-yapf -i -r -p -vv --style google ./
+apf -ir --style google .
 echo "Done!"
