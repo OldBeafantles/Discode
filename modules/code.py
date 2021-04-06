@@ -13,18 +13,6 @@ from tzlocal import get_localzone
 class Code(commands.Cog):
     """Code module"""
 
-    async def send_cmd_help(self, ctx, message: str = ""):
-        if ctx.invoked_subcommand:
-            pages = self.bot.formatter.format_help_for(ctx,
-                                                       ctx.invoked_subcommand)
-            for page in pages:
-                await self.bot.send_message(ctx.message.channel,
-                                            message + "\n" + page)
-        else:
-            pages = await self.bot.formatter.format_help_for(ctx, ctx.command)
-            for page in pages:
-                await ctx.message.channel.send(message + "\n" + page)
-
     def __init__(self, bot):
         self.bot = bot
         self.timeout = 15
@@ -763,10 +751,10 @@ class Code(commands.Cog):
         utils.save_json(self.users_configuration, self.users_configuration_path)
 
     @commands.group()
-    async def config(self, ctx):
+    async def config(self, ctx: commands.Context):
         """Configures your default settings"""
         if ctx.invoked_subcommand is None:
-            await self.send_cmd_help(ctx)
+            await ctx.send_help(ctx.command)
 
     @config.command()
     async def output(self, ctx, output_mode: str = ""):
