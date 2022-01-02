@@ -11,15 +11,8 @@ import os
 import sys
 
 # Useful functions
-if sys.platform == "win32" or sys.platform == "win64":
-
-    def clear():
-        return os.system("cls")
-else:
-
-    def clear():
-        return os.system("clear")
-
+def clear():
+    return os.system('clear' if not sys.platform in ['win32', 'win64'] else 'cls')
 
 def _prefix_callable(bot, msg):
     return [
